@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Shared User Identity Documents (users/{userId})
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 2. Customer Profile Documents (customerProfiles/{userId})
+    match /customerProfiles/{userId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 3. Provider Profile Documents (providerProfiles/{userId})
+    match /providerProfiles/{userId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 4. Services Catalog Documents (services/{serviceId})
+    match /services/{serviceId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    // 5. Supplies Catalog Documents (supplies/{supplyId})
+    match /supplies/{supplyId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    // 6. Orders Collection Documents (orders/{orderId})
+    match /orders/{orderId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+
+    // 7. Reviews Collection Documents (reviews/{reviewId})
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+  }
+}

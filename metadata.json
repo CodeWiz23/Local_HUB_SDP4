@@ -1,0 +1,6 @@
+{
+  "name": "LocalHub",
+  "description": "Hyperlocal Home Service & Rental Marketplace with live customer ratings, manual delivery confirmation workflows, provider manpower & decor operations matrix, and real-time fleet simulation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,1275 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service Provider Operations, Decor Schedule & Manpower Hub — LocalHub</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar" id="mainNavbar">
+      <div class="navbar-container">
+        <a href="./index.html" class="logo" id="logoLink">
+          <div class="logo-icon-svg">
+            <div class="logo-icon-inner">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <span class="logo-text">LocalHub</span>
+        </a>
+        <div class="nav-links" id="navAuthActions">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="dashboard-layout" style="display: block; max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem;">
+      
+      <!-- Top Profile & KPI Summary Header -->
+      <div style="background: var(--white); border: 1px solid var(--slate-200); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, #10b981, #06b6d4); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 800; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+              🏪
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <h1 id="providerWelcomeTitle" style="font-size: 1.45rem; font-weight: 800; margin: 0; color: var(--slate-900);">Provider Operations Center</h1>
+                <span class="delivery-verified-badge" style="background: #ecfdf5; color: #047857; border-color: #a7f3d0; font-size: 0.75rem;">✔ Certified Provider</span>
+              </div>
+              <p style="color: var(--slate-500); font-size: 0.85rem; margin: 0.25rem 0 0 0;">Manage your 24/7 decor schedule, manpower matrix, incoming orders, and earnings in one unified workspace.</p>
+            </div>
+          </div>
+
+          <!-- Quick KPI Strip -->
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 0.5rem 0.85rem; text-align: center; min-width: 80px;">
+              <span style="font-size: 0.68rem; color: var(--slate-500); text-transform: uppercase; font-weight: 700; display: block;">Orders</span>
+              <strong id="kpiIncomingCount" style="color: var(--emerald-600); font-size: 1.15rem;">0</strong>
+            </div>
+            <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 0.5rem 0.85rem; text-align: center; min-width: 80px;">
+              <span style="font-size: 0.68rem; color: var(--slate-500); text-transform: uppercase; font-weight: 700; display: block;">Decor Shifts</span>
+              <strong id="kpiDecorCount" style="color: #7c3aed; font-size: 1.15rem;">3</strong>
+            </div>
+            <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 0.5rem 0.85rem; text-align: center; min-width: 80px;">
+              <span style="font-size: 0.68rem; color: var(--slate-500); text-transform: uppercase; font-weight: 700; display: block;">Crew</span>
+              <strong id="kpiCrewCount" style="color: #0284c7; font-size: 1.15rem;">5</strong>
+            </div>
+            <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 0.5rem 0.85rem; text-align: center; min-width: 80px;">
+              <span style="font-size: 0.68rem; color: var(--slate-500); text-transform: uppercase; font-weight: 700; display: block;">Revenue</span>
+              <strong id="kpiRevenueAmount" style="color: var(--slate-900); font-size: 1.15rem;">TK 0.00</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segmented Navigation Tabs Bar with Side-Scroll Controls -->
+      <div class="provider-nav-tabs-wrapper">
+        <button type="button" class="provider-tabs-scroll-btn" onclick="scrollProviderTabs('left')" title="Scroll tabs left">◀</button>
+        <div class="provider-nav-tabs" id="providerNavTabs">
+          <button type="button" class="provider-nav-tab active" onclick="switchProviderTab('orders', this)">
+            <span>📋</span>
+            <span>Live Orders & Dispatch</span>
+            <span class="tab-badge" id="tabBadgeOrders">0</span>
+          </button>
+          <button type="button" class="provider-nav-tab" onclick="switchProviderTab('decor', this)">
+            <span>🎨</span>
+            <span>Decor Staging Schedule (24/7)</span>
+            <span class="tab-badge" id="tabBadgeDecor">3</span>
+          </button>
+          <button type="button" class="provider-nav-tab" onclick="switchProviderTab('crew', this)">
+            <span>👥</span>
+            <span>Crew & Manpower Matrix</span>
+            <span class="tab-badge" id="tabBadgeCrew">5</span>
+          </button>
+          <button type="button" class="provider-nav-tab" onclick="switchProviderTab('fleet', this)">
+            <span>🛵</span>
+            <span>BD Area Fleet Tracking</span>
+            <span class="tab-badge" style="background: #0284c7; color: white;">20 Riders</span>
+          </button>
+          <button type="button" class="provider-nav-tab" onclick="switchProviderTab('publish', this)">
+            <span>📦</span>
+            <span>Publish & Inventory</span>
+          </button>
+          <button type="button" class="provider-nav-tab" onclick="switchProviderTab('revenue', this)">
+            <span>⭐</span>
+            <span>Revenue & Reviews</span>
+          </button>
+        </div>
+        <button type="button" class="provider-tabs-scroll-btn" onclick="scrollProviderTabs('right')" title="Scroll tabs right">▶</button>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- TAB PANE 1: LIVE ORDERS & DISPATCH -->
+      <!-- ========================================================================= -->
+      <div class="provider-tab-pane" id="pane-orders" style="display: block;">
+        <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+          
+          <!-- Incoming Orders Panel -->
+          <div class="dashboard-panel" style="border: 1.5px solid #10b981;">
+            <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.2rem;">📥</span>
+                <strong style="color: #047857;">Real-Time Incoming Customer Job Orders</strong>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span id="incomingRequestsCountBadge" class="request-meta-badge" style="background: #dcfce7; color: #15803d; border-color: #86efac; display: none;">0 New</span>
+                <span style="font-size: 0.7rem; color: #059669; font-weight: 600; display: flex; align-items: center; gap: 0.3rem;">
+                  <span class="crew-status-dot status-dot-available" style="width: 8px; height: 8px; animation: pulseGlowRing 1.5s infinite;"></span>
+                  Live Orders Bus Active
+                </span>
+              </div>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--slate-500); margin: 0.25rem 0 0.75rem 0;">
+              Incoming bookings placed by customers appear here immediately in real-time. Accept to initiate team dispatch.
+            </p>
+            <div class="requests-list" id="incomingRequestsList">
+              <!-- Rendered dynamically in real-time -->
+            </div>
+          </div>
+
+          <!-- Currently Engaged Active Job Panel -->
+          <div class="dashboard-panel" id="activeJobPanel" style="border: 1.5px solid #38bdf8;">
+            <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.2rem;">⚡</span>
+                <strong style="color: #0284c7;">Currently Engaged Active Job</strong>
+              </div>
+              <span id="activeJobBadge" class="request-meta-badge" style="background-color: var(--emerald-500); color: var(--slate-950); display: none;">IN PROGRESS</span>
+            </div>
+            <div id="activeJobContainer" style="margin-top: 0.75rem;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- TAB PANE 2: DECOR & STAGING SCHEDULE (24/7 PLANNER) -->
+      <!-- ========================================================================= -->
+      <div class="provider-tab-pane" id="pane-decor" style="display: none;">
+        <div class="dashboard-panel" style="border: 1.5px solid #8b5cf6;">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.2rem;">🎨</span>
+              <strong style="color: #6d28d9;">Provider Decor & Staging Schedule (24/7 Always Active)</strong>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <span id="decorScheduleCountBadge" class="request-meta-badge" style="background: #ede9fe; color: #6d28d9; border-color: #c4b5fd;">3 Shifts</span>
+              <button onclick="toggleAddDecorModal(true)" class="btn btn-sm btn-primary" style="background: #7c3aed; border-color: #6d28d9; font-size: 0.75rem; padding: 0.35rem 0.85rem; font-weight: 700;">
+                ➕ Schedule New Decor Project
+              </button>
+            </div>
+          </div>
+
+          <p style="font-size: 0.85rem; color: var(--slate-500); margin: 0.25rem 0 1rem 0;">
+            Manage and view your staging timetable, venue rigging slots, and crew assignments at all times independently of customer orders.
+          </p>
+
+          <!-- Decor Schedule Time Slots / Filter Buttons -->
+          <div class="filter-pills-bar" id="scheduleFilterBar" style="margin-bottom: 1rem;">
+            <button class="filter-pill-btn active" onclick="filterDecorSchedule('all', this)">All Slots</button>
+            <button class="filter-pill-btn" onclick="filterDecorSchedule('morning', this)">🌅 Morning (8 AM - 12 PM)</button>
+            <button class="filter-pill-btn" onclick="filterDecorSchedule('afternoon', this)">☀️ Afternoon (1 PM - 5 PM)</button>
+            <button class="filter-pill-btn" onclick="filterDecorSchedule('evening', this)">🌙 Evening (6 PM - 10 PM)</button>
+          </div>
+
+          <!-- Schedule Grid Container -->
+          <div class="decor-schedule-grid" id="decorScheduleGrid">
+            <!-- Populated via JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- TAB PANE 3: CREW & MANPOWER MATRIX -->
+      <!-- ========================================================================= -->
+      <div class="provider-tab-pane" id="pane-crew" style="display: none;">
+        <div class="dashboard-panel" style="border: 1.5px solid #6366f1;">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.2rem;">👥</span>
+              <strong style="color: #4338ca;">Available Manpower Matrix & Staff Operations (24/7)</strong>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <span id="availableCrewCountBadge" class="delivery-verified-badge" style="font-size: 0.75rem;">2 Crew Available</span>
+              <button onclick="triggerManualSimTick()" class="btn btn-sm btn-outline" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; color: #4338ca; border-color: #c7d2fe; font-weight: 600;">
+                🔄 Refresh Telemetry
+              </button>
+            </div>
+          </div>
+
+          <!-- Real-Time Simulation Status Ticker -->
+          <div class="live-simulation-ticker" id="liveSimTicker" style="margin-top: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="crew-status-dot status-dot-available" style="animation: pulseGlowRing 2s infinite;"></span>
+              <span id="simTickerText">⚡ Operations Telemetry: Real-time crew availability, vehicle fleet states, and live shifts active.</span>
+            </div>
+          </div>
+
+          <!-- Crew Status Filter Bar -->
+          <div class="filter-pills-bar" id="crewFilterBar" style="margin-top: 1rem; margin-bottom: 1rem;">
+            <button class="filter-pill-btn active" onclick="filterManpower('all', this)">All Staff (5)</button>
+            <button class="filter-pill-btn" onclick="filterManpower('available', this)">🟢 Available Now</button>
+            <button class="filter-pill-btn" onclick="filterManpower('on_site', this)">🔵 On-Site Staging</button>
+            <button class="filter-pill-btn" onclick="filterManpower('dispatched', this)">🚚 In Transit</button>
+            <button class="filter-pill-btn" onclick="filterManpower('on_break', this)">☕ On Break</button>
+          </div>
+
+          <!-- Staff Crew Roster Grid -->
+          <div class="manpower-roster-grid" id="crewRosterGrid">
+            <!-- Populated via JavaScript -->
+          </div>
+
+          <!-- Decor Supplies Warehouse Allocation Matrix -->
+          <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px dashed var(--slate-200);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <div>
+                <h4 style="font-size: 0.95rem; margin: 0; color: var(--slate-800); font-weight: 700;">🎨 Warehouse Decor Supplies & Stock Fulfillment</h4>
+                <span style="font-size: 0.75rem; color: var(--slate-500);">Live Inventory Control with fast stepper adjustment</span>
+              </div>
+            </div>
+            <div id="decorInventoryMatrix" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem;">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- TAB PANE 4: BD AREA FLEET TRACKING (20 RIDERS) -->
+      <!-- ========================================================================= -->
+      <div class="provider-tab-pane" id="pane-fleet" style="display: none;">
+        <div class="dashboard-panel" style="border: 1.5px solid #0284c7;">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.2rem;">🛵</span>
+              <strong style="color: #0284c7;">Bangladesh Delivery Fleet Tracking (20 Dedicated Couriers)</strong>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <span class="delivery-verified-badge" style="background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; font-size: 0.75rem;">
+                🟢 20 Couriers in 5 Operational Zones
+              </span>
+              <a href="./fleet-tracking.html" class="btn btn-sm btn-primary" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; background: #0284c7; text-decoration: none;">
+                ↗ Open Fullscreen Radar
+              </a>
+            </div>
+          </div>
+
+          <p style="font-size: 0.85rem; color: var(--slate-500); margin: 0.25rem 0 1rem 0;">
+            Live distribution across Dhaka Central, Dhaka South, Dhaka North Extension, Chattogram Metro, and Sylhet Regional Hubs. Use the area filters or side-scroll carousel below to inspect rider battery, parcel assignments, and active courier availability.
+          </p>
+
+          <!-- Zone Filter Pills Bar with Horizontal Scroll -->
+          <div style="margin-bottom: 1rem;">
+            <div class="filter-pills-bar" id="providerFleetZoneFilterBar" style="display: flex; gap: 0.5rem; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 0.35rem;">
+              <button type="button" class="filter-pill-btn active" onclick="filterProviderFleetZone('all', this)">All Zones (20)</button>
+              <button type="button" class="filter-pill-btn" onclick="filterProviderFleetZone('Dhaka Central & Diplomatic', this)">📍 Dhaka Central (4)</button>
+              <button type="button" class="filter-pill-btn" onclick="filterProviderFleetZone('Dhaka South & Old Town', this)">📍 Dhaka South (4)</button>
+              <button type="button" class="filter-pill-btn" onclick="filterProviderFleetZone('Dhaka North Extension', this)">📍 Dhaka North (4)</button>
+              <button type="button" class="filter-pill-btn" onclick="filterProviderFleetZone('Chattogram Metro', this)">📍 Chattogram (4)</button>
+              <button type="button" class="filter-pill-btn" onclick="filterProviderFleetZone('Sylhet & Regional Hubs', this)">📍 Sylhet (4)</button>
+            </div>
+          </div>
+
+          <!-- Carousel Controls Header -->
+          <div style="margin-bottom: 0.65rem; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--slate-700);">
+              Active Couriers (<span id="providerFleetActiveCount">20</span>): <span style="font-weight: 400; color: var(--slate-500);">Side-scroll with trackpad, touch swipe, or buttons:</span>
+            </span>
+            <div style="display: flex; gap: 0.35rem;">
+              <button type="button" onclick="scrollFleetCarousel('left')" class="btn btn-sm btn-outline" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;">◀ Scroll Left</button>
+              <button type="button" onclick="scrollFleetCarousel('right')" class="btn btn-sm btn-outline" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;">Scroll Right ▶</button>
+            </div>
+          </div>
+
+          <!-- Horizontal Side-Scroll Deliveryman Fleet Carousel -->
+          <div class="fleet-horizontal-scroll-container" id="providerFleetCardsContainer">
+            <!-- Populated dynamically with 20 Bangladeshi riders -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- TAB PANE 5: PUBLISH CATALOG & INVENTORY -->
+      <!-- ========================================================================= -->
+      <div class="provider-tab-pane" id="pane-publish" style="display: none;">
+        <div class="dashboard-panel" style="border: 1.5px solid #06b6d4; max-width: 800px; margin: 0 auto;">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.2rem;">📦</span>
+              <strong style="color: #0891b2;">Publish New Service or Decor Supply Item</strong>
+            </div>
+            <span class="delivery-verified-badge" style="background: #ecfeff; color: #0891b2; border-color: #a5f3fc; font-size: 0.75rem;">Live Catalog Sync</span>
+          </div>
+
+          <p style="font-size: 0.85rem; color: var(--slate-500); margin: 0.25rem 0 1rem 0;">
+            List brand new service packages, specialized decor items, or rental fleet offerings to appear in the customer marketplace instantly.
+          </p>
+
+          <form onsubmit="handlePublishItem(event)">
+            <div class="form-group">
+              <label style="font-weight: 600; font-size: 0.85rem;">Item Type</label>
+              <select id="pubType" class="form-control" onchange="togglePubTypeFields(this.value)">
+                <option value="service">Service Offering (e.g., Wall Decorating, Deep Cleaning, Car Rental)</option>
+                <option value="supply">Physical Decor Supply / Add-on Item</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label style="font-weight: 600; font-size: 0.85rem;">Title</label>
+              <input type="text" id="pubTitle" class="form-control" placeholder="e.g. Festive Lighting Setup" required />
+            </div>
+            <div class="form-group" id="pubCatGroup">
+              <label style="font-weight: 600; font-size: 0.85rem;">Category</label>
+              <select id="pubCategory" class="form-control">
+                <option value="home-decor">Home Decoration</option>
+                <option value="cleaning">Cleaning Services</option>
+                <option value="car-rentals">Car Rentals</option>
+              </select>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+              <div class="form-group" style="flex: 1;">
+                <label style="font-weight: 600; font-size: 0.85rem;">Price (TK)</label>
+                <input type="number" step="0.01" id="pubPrice" class="form-control" placeholder="120.00" required />
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label style="font-weight: 600; font-size: 0.85rem;">Unit / Pricing Basis</label>
+                <input type="text" id="pubUnit" class="form-control" placeholder="e.g. job, room, day, pack" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label style="font-weight: 600; font-size: 0.85rem;">Description</label>
+              <textarea id="pubDescription" class="form-control" rows="3" placeholder="Describe the service or supply product..."></textarea>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+              <div class="form-group" style="flex: 1;">
+                <label style="font-weight: 600; font-size: 0.85rem;">Icon Emoji</label>
+                <input type="text" id="pubIcon" class="form-control" placeholder="🎨" value="✨" />
+              </div>
+              <div class="form-group" id="pubStockGroup" style="flex: 1; display: none;">
+                <label style="font-weight: 600; font-size: 0.85rem;">Initial Stock</label>
+                <input type="number" id="pubStock" class="form-control" value="50" />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm" id="pubSubmitBtn" style="width: 100%; margin-top: 0.75rem; font-weight: 700; padding: 0.65rem;">Save to Firestore Collection</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- TAB PANE 5: REVENUE & CUSTOMER FEEDBACK -->
+      <!-- ========================================================================= -->
+      <div class="provider-tab-pane" id="pane-revenue" style="display: none;">
+        <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+          
+          <!-- Earnings Breakdown Panel -->
+          <div class="dashboard-panel" id="earningsPanel" style="border: 1.5px solid #10b981;">
+            <div class="panel-title">
+              <span>📊 Marketplace Earnings & Payouts</span>
+            </div>
+            
+            <div class="metrics-grid" style="margin-top: 0.75rem;">
+              <div class="metric-card">
+                <span>Jobs Closed</span>
+                <h3 id="completedJobsMetric">0</h3>
+              </div>
+              <div class="metric-card revenue">
+                <span>Gross Revenue</span>
+                <h3 id="totalRevenueMetric">TK 0.00</h3>
+              </div>
+            </div>
+
+            <div style="font-size: 0.85rem; color: var(--slate-600); border-top: 1px solid var(--slate-100); padding-top: 1rem; margin-top: 1rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span>Net Earnings (Post-Fee):</span>
+                <strong id="netRevenueMetric" style="color: var(--emerald-700); font-size: 1.15rem;">TK 0.00</strong>
+              </div>
+              <div style="background: var(--slate-50); border: 1px solid var(--slate-200); padding: 0.65rem; border-radius: var(--radius-sm); font-size: 0.75rem; color: var(--slate-500);">
+                💡 Platform fee of TK 5.00 per job is deducted at payout.
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Feedback & Star Ratings Feed -->
+          <div class="dashboard-panel" id="feedbackActivityPanel" style="border: 1.5px solid #f59e0b;">
+            <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center;">
+              <span>💬 Live Customer Reviews & Ratings</span>
+              <span class="delivery-verified-badge" style="background: #fef3c7; color: #b45309; border-color: #fde68a; font-size: 0.75rem;">⭐ Verified Ratings</span>
+            </div>
+            <div class="orders-list" id="providerFeedbackList" style="margin-top: 0.75rem;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal for Adding Decor Schedule Project -->
+    <div id="decorModalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 9999; justify-content: center; align-items: center; padding: 1rem;">
+      <div style="background: var(--white); border-radius: var(--radius-lg); max-width: 540px; width: 100%; padding: 1.5rem; box-shadow: var(--shadow-xl); max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--slate-200); padding-bottom: 0.5rem;">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #4338ca;">🎨 Schedule Decor & Staging Project</h3>
+          <button onclick="toggleAddDecorModal(false)" style="background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--slate-400);">&times;</button>
+        </div>
+
+        <form id="decorScheduleForm" onsubmit="handleSaveDecorSchedule(event)">
+          <div class="form-group">
+            <label style="font-size: 0.85rem; font-weight: 600;">Project / Staging Title</label>
+            <input type="text" id="schTitle" class="form-control" placeholder="e.g. Garden Pavilion Floral Canopy Setup" required />
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <div class="form-group" style="flex: 1;">
+              <label style="font-size: 0.85rem; font-weight: 600;">Category</label>
+              <select id="schCategory" class="form-control">
+                <option value="Home & Venue Decor">Home & Venue Decor</option>
+                <option value="Lighting Rigging">Lighting Rigging</option>
+                <option value="Banquet Staging">Banquet Staging</option>
+                <option value="Balloon Arches">Balloon Arches</option>
+                <option value="Seasonal / Holiday">Seasonal / Holiday</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label style="font-size: 0.85rem; font-weight: 600;">Date</label>
+              <input type="date" id="schDate" class="form-control" required />
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <div class="form-group" style="flex: 1;">
+              <label style="font-size: 0.85rem; font-weight: 600;">Time Slot</label>
+              <select id="schSlotType" class="form-control" onchange="updateDefaultTimeSlotText(this.value)">
+                <option value="morning">Morning (09:00 AM - 12:30 PM)</option>
+                <option value="afternoon">Afternoon (02:00 PM - 05:30 PM)</option>
+                <option value="evening">Evening (06:00 PM - 09:30 PM)</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label style="font-size: 0.85rem; font-weight: 600;">Assign Lead Artisan</label>
+              <select id="schAssignedCrew" class="form-control">
+                <!-- Populated dynamically from manpower -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label style="font-size: 0.85rem; font-weight: 600;">Venue Address / Client Location</label>
+            <input type="text" id="schLocation" class="form-control" placeholder="e.g. 742 Evergreen Terrace (West Wing Ballroom)" required />
+          </div>
+
+          <div class="form-group">
+            <label style="font-size: 0.85rem; font-weight: 600;">Equipment & Decor Supplies Required</label>
+            <textarea id="schNotes" class="form-control" rows="2" placeholder="e.g. 8x Botanical Garlands, 2x Wireless Dimmer Lights, Step Ladder"></textarea>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;">
+            <button type="button" onclick="toggleAddDecorModal(false)" class="btn btn-sm btn-outline">Cancel</button>
+            <button type="submit" class="btn btn-sm btn-primary" style="background: #7c3aed; border-color: #6d28d9;">Confirm & Save Schedule</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-bottom" style="margin-top: 0; padding-top: 0; border: none; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <p>&copy; 2026 LocalHub Technologies Inc. All rights reserved.</p>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button class="theme-toggle-btn" onclick="window.toggleTheme()">🌙 Switch Theme</button>
+          <a href="./delivery.html" style="color: var(--emerald-400);">Delivery Fleet Portal</a>
+        </div>
+        <p>Provider Dashboard synced reactively via Firebase Cloud Firestore & Global Event Bus.</p>
+      </div>
+    </footer>
+
+    <!-- Core Script Imports -->
+    <script type="module" src="./app.js"></script>
+    <script>
+      let allOrders = [];
+      let previousPendingCount = 0;
+      let activeScheduleFilter = "all";
+      let activeManpowerFilter = "all";
+      let activeProviderFleetZone = "all";
+
+      let decorStock = {
+        "LED Fairy Lights (50m)": 28,
+        "Premium Velvet Drapes": 14,
+        "Floral Archway Frame": 6,
+        "Helium Party Balloon Kit": 45,
+        "Quiet Power Station (1000W)": 4,
+        "Botanical Garland Vines": 35
+      };
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const user = window.LocalHubStore.getCurrentUser();
+        if (!user) {
+          window.location.href = "./auth.html?tab=login";
+          return;
+        }
+
+        if (user.name) {
+          document.getElementById("providerWelcomeTitle").innerText = `Provider Operations Hub — ${user.name}`;
+        }
+
+        // Set default date for decor modal
+        const todayStr = new Date().toISOString().split("T")[0];
+        const schDateInput = document.getElementById("schDate");
+        if (schDateInput) schDateInput.value = todayStr;
+
+        // Render 24/7 Decor Schedule
+        renderDecorSchedule();
+
+        // Render 24/7 Manpower & Crew Matrix
+        renderManpowerMatrix();
+
+        // Render BD Area Fleet Tracking
+        renderProviderFleetTracking();
+
+        // Render Decor Inventory Warehouse
+        renderDecorWarehouse();
+
+        // Populate Lead Artisan dropdown in modal
+        populateCrewSelectDropdown();
+
+        // Subscribe to real-time orders (0ms lag with cross-tab and in-memory bus)
+        window.LocalHubStore.listenToOrders(user, (orders) => {
+          allOrders = orders;
+          
+          const pending = orders.filter(o => o.status === "pending");
+          if (pending.length > previousPendingCount && previousPendingCount !== 0) {
+            window.showToastNotification(`🔔 New customer job order received in real-time (#${pending[0].orderNumber || pending[0].id})!`);
+          }
+          previousPendingCount = pending.length;
+
+          renderProviderDashboard();
+          updateHeaderKPIs();
+        });
+
+        // Listen for rider telemetry updates across tabs
+        window.addEventListener("lh_orders_changed", () => {
+          renderProviderFleetTracking();
+        });
+      });
+
+      // -------------------------------------------------------------
+      // TAB NAVIGATION & SIDE-SCROLL LOGIC
+      // -------------------------------------------------------------
+      window.scrollProviderTabs = function(dir) {
+        const container = document.getElementById("providerNavTabs");
+        if (!container) return;
+        const amount = dir === 'left' ? -220 : 220;
+        container.scrollBy({ left: amount, behavior: 'smooth' });
+      };
+
+      window.switchProviderTab = function(tabName, btn) {
+        document.querySelectorAll(".provider-tab-pane").forEach(pane => {
+          pane.style.display = "none";
+        });
+        const targetPane = document.getElementById(`pane-${tabName}`);
+        if (targetPane) {
+          targetPane.style.display = "block";
+        }
+        document.querySelectorAll(".provider-nav-tab").forEach(tab => {
+          tab.classList.remove("active");
+        });
+        if (btn) {
+          btn.classList.add("active");
+        }
+
+        if (tabName === "fleet") {
+          renderProviderFleetTracking();
+        }
+      };
+
+      // -------------------------------------------------------------
+      // FLEET TRACKING CAROUSEL & ZONE FILTERING (20 BD RIDERS)
+      // -------------------------------------------------------------
+      window.scrollFleetCarousel = function(dir) {
+        const container = document.getElementById("providerFleetCardsContainer");
+        if (!container) return;
+        const amount = dir === 'left' ? -340 : 340;
+        container.scrollBy({ left: amount, behavior: 'smooth' });
+      };
+
+      window.filterProviderFleetZone = function(zone, btn) {
+        activeProviderFleetZone = zone;
+        document.querySelectorAll("#providerFleetZoneFilterBar .filter-pill-btn").forEach(b => b.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+        renderProviderFleetTracking();
+      };
+
+      function renderProviderFleetTracking() {
+        const riders = window.LocalHubStore.getDeliveryRiders();
+        const container = document.getElementById("providerFleetCardsContainer");
+        const countBadge = document.getElementById("providerFleetActiveCount");
+        if (!container) return;
+
+        let filtered = riders;
+        if (activeProviderFleetZone !== "all") {
+          filtered = riders.filter(r => r.area === activeProviderFleetZone);
+        }
+
+        if (countBadge) {
+          countBadge.innerText = `${filtered.length} of ${riders.length}`;
+        }
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state" style="padding: 2rem; width: 100%; text-align: center;">
+              <p>No delivery couriers assigned to "${activeProviderFleetZone}".</p>
+            </div>
+          `;
+          return;
+        }
+
+        const statusBadges = {
+          available: `<span class="delivery-verified-badge" style="font-size: 0.68rem; background: #ecfdf5; color: #047857; border-color: #a7f3d0;">🟢 Standby / Available</span>`,
+          on_trip: `<span class="delivery-verified-badge" style="font-size: 0.68rem; background: #e0f2fe; color: #0284c7; border-color: #7dd3fc;">🚚 In Transit</span>`,
+          handing_over: `<span class="delivery-manual-badge" style="font-size: 0.68rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">📦 Handing Over</span>`,
+          offline: `<span class="delivery-manual-badge" style="font-size: 0.68rem; background: #f1f5f9; color: #64748b; border-color: #cbd5e1;">☕ Off Duty</span>`
+        };
+
+        container.innerHTML = filtered.map(rider => {
+          const batteryColor = rider.batteryLevel > 60 ? '#16a34a' : (rider.batteryLevel > 30 ? '#d97706' : '#dc2626');
+          return `
+            <div class="fleet-zone-card-horizontal" id="provider_rider_${rider.id}">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; gap: 0.4rem;">
+                  <div>
+                    <strong style="font-size: 0.95rem; color: var(--slate-900); display: block;">${rider.name}</strong>
+                    <span style="font-size: 0.72rem; color: var(--slate-500); font-family: monospace;">Courier ID: ${rider.id}</span>
+                  </div>
+                  ${statusBadges[rider.status] || statusBadges.available}
+                </div>
+
+                <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-sm); padding: 0.6rem; margin: 0.4rem 0; font-size: 0.75rem; color: var(--slate-700);">
+                  <div style="margin-bottom: 0.25rem;">📍 <strong>Assigned Area:</strong> <span style="color: #0284c7; font-weight: 600;">${rider.area}</span></div>
+                  <div style="margin-bottom: 0.25rem;">🛵 <strong>Vehicle:</strong> ${rider.vehicle} (${rider.vehiclePlate})</div>
+                  <div style="margin-bottom: 0.25rem;">📞 <strong>Phone:</strong> <a href="tel:${rider.phone}" style="color: var(--emerald-700); font-weight: 600;">${rider.phone}</a></div>
+                  <div>📦 <strong>Active Parcel:</strong> ${rider.activeParcel || 'None (Ready for dispatch)'}</div>
+                </div>
+              </div>
+
+              <div style="border-top: 1px solid var(--slate-100); padding-top: 0.5rem; margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem;">
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                  <span style="color: ${batteryColor}; font-weight: 700;">⚡ Battery:</span>
+                  <span style="font-weight: 600;">${rider.batteryLevel}%</span>
+                </div>
+                <button type="button" onclick="toggleProviderRiderStatus('${rider.id}')" class="btn btn-sm btn-outline" style="font-size: 0.68rem; padding: 0.2rem 0.5rem;">
+                  Shift Status
+                </button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      window.toggleProviderRiderStatus = function(riderId) {
+        const statuses = ["available", "on_trip", "handing_over", "offline"];
+        const riders = window.LocalHubStore.getDeliveryRiders();
+        const rider = riders.find(r => r.id === riderId);
+        if (!rider) return;
+        const nextIdx = (statuses.indexOf(rider.status) + 1) % statuses.length;
+        window.LocalHubStore.updateRiderStatus(riderId, statuses[nextIdx]);
+        renderProviderFleetTracking();
+        window.showToastNotification(`Courier ${rider.name} status shifted to: ${statuses[nextIdx].toUpperCase().replace('_', ' ')}`);
+      };
+
+      function updateHeaderKPIs() {
+        const pending = allOrders.filter(o => o.status === "pending").length;
+        const active = allOrders.filter(o => ["accepted", "dispatched", "executing", "delivered_pending_confirmation", "delivered"].includes(o.status)).length;
+        const completed = allOrders.filter(o => o.status === "paid" || o.status === "delivered").length;
+        
+        let grossRev = 0;
+        allOrders.filter(o => o.status === "paid" || o.status === "delivered").forEach(o => {
+          grossRev += parseFloat(o.totalPrice || o.price || 0);
+        });
+
+        // Tab badge
+        const tabOrdersBadge = document.getElementById("tabBadgeOrders");
+        if (tabOrdersBadge) {
+          tabOrdersBadge.innerText = pending;
+          tabOrdersBadge.style.display = pending > 0 ? "inline-block" : "none";
+        }
+
+        // Header KPI Strip Elements
+        const kpiIncomingEl = document.getElementById("kpiIncomingCount");
+        const kpiRevenueEl = document.getElementById("kpiRevenueAmount");
+
+        if (kpiIncomingEl) kpiIncomingEl.innerText = pending;
+        if (kpiRevenueEl) kpiRevenueEl.innerText = `TK ${grossRev.toFixed(2)}`;
+
+        // Also update the dedicated revenue tab metrics
+        renderEarningsAndReviews();
+      }
+
+      // -------------------------------------------------------------
+      // 1. DECOR & STAGING SCHEDULE ENGINE (24/7 Persistent Planner)
+      // -------------------------------------------------------------
+      function renderDecorSchedule() {
+        const schedule = window.LocalHubStore.getDecorSchedule();
+        const grid = document.getElementById("decorScheduleGrid");
+        const countBadge = document.getElementById("decorScheduleCountBadge");
+        if (!grid) return;
+
+        let filtered = schedule;
+        if (activeScheduleFilter !== "all") {
+          filtered = schedule.filter(s => s.slotType === activeScheduleFilter);
+        }
+
+        if (countBadge) {
+          countBadge.innerText = `${schedule.length} Total Shifts`;
+        }
+
+        if (filtered.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1; padding: 2rem;">
+              <p>No decor staging shifts scheduled in this time slot.</p>
+              <button onclick="toggleAddDecorModal(true)" class="btn btn-sm btn-outline" style="margin-top: 0.5rem;">➕ Add Shift</button>
+            </div>
+          `;
+          return;
+        }
+
+        const slotBadgeClasses = {
+          morning: "slot-morning",
+          afternoon: "slot-afternoon",
+          evening: "slot-evening"
+        };
+
+        const statusBadges = {
+          scheduled: `<span class="delivery-manual-badge" style="font-size: 0.65rem; background: #f1f5f9; color: #475569; border-color: #cbd5e1;">Scheduled</span>`,
+          in_progress: `<span class="delivery-verified-badge" style="font-size: 0.65rem; background: #e0e7ff; color: #4338ca; border-color: #a5b4fc;">⚡ In-Progress</span>`,
+          ready: `<span class="delivery-verified-badge" style="font-size: 0.65rem; background: #ecfdf5; color: #047857; border-color: #a7f3d0;">✨ Ready</span>`,
+          completed: `<span class="delivery-verified-badge" style="font-size: 0.65rem;">✔ Completed</span>`
+        };
+
+        grid.innerHTML = filtered.map(item => `
+          <div class="decor-schedule-card" id="decor_sch_${item.id}">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; gap: 0.4rem;">
+                <span class="decor-slot-badge ${slotBadgeClasses[item.slotType] || 'slot-morning'}">${item.timeSlot}</span>
+                ${statusBadges[item.status] || statusBadges.scheduled}
+              </div>
+
+              <strong style="font-size: 0.95rem; color: var(--slate-900); display: block; margin-bottom: 0.2rem;">${item.title}</strong>
+              <span style="font-size: 0.75rem; color: #6d28d9; font-weight: 600;">🏷️ ${item.category} • 📅 ${item.date}</span>
+
+              <div style="font-size: 0.78rem; color: var(--slate-600); margin: 0.5rem 0; background: var(--slate-50); padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--slate-100);">
+                <div>📍 <strong>Venue:</strong> ${item.location}</div>
+                <div>👤 <strong>Assigned Artisan:</strong> ${item.assignedCrewName}</div>
+                ${item.notes ? `<div style="margin-top: 0.25rem; font-size: 0.75rem; color: var(--slate-500);">📦 <em>${item.notes}</em></div>` : ''}
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--slate-100); padding-top: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; gap: 0.3rem;">
+              <div style="display: flex; gap: 0.25rem;">
+                <button onclick="cycleDecorStatus('${item.id}')" class="btn btn-sm btn-outline" style="font-size: 0.7rem; padding: 0.2rem 0.45rem;">
+                  Shift Status
+                </button>
+              </div>
+              <button onclick="removeDecorItem('${item.id}')" style="background: none; border: none; color: var(--red-500); font-size: 0.75rem; cursor: pointer;">
+                🗑️ Remove
+              </button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      window.filterDecorSchedule = function(slot, btn) {
+        activeScheduleFilter = slot;
+        document.querySelectorAll("#scheduleFilterBar .filter-pill-btn").forEach(b => b.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+        renderDecorSchedule();
+      };
+
+      window.toggleAddDecorModal = function(show) {
+        const modal = document.getElementById("decorModalOverlay");
+        if (modal) modal.style.display = show ? "flex" : "none";
+      };
+
+      window.updateDefaultTimeSlotText = function(val) {
+        // Automatically keeps consistency
+      };
+
+      window.handleSaveDecorSchedule = function(e) {
+        e.preventDefault();
+        const title = document.getElementById("schTitle").value.trim();
+        const category = document.getElementById("schCategory").value;
+        const date = document.getElementById("schDate").value;
+        const slotType = document.getElementById("schSlotType").value;
+        const crewSelect = document.getElementById("schAssignedCrew");
+        const assignedCrewId = crewSelect.value;
+        const assignedCrewName = crewSelect.options[crewSelect.selectedIndex]?.text || "Lead Artisan";
+        const location = document.getElementById("schLocation").value.trim();
+        const notes = document.getElementById("schNotes").value.trim();
+
+        const slotLabels = {
+          morning: "09:00 AM - 12:30 PM",
+          afternoon: "02:00 PM - 05:30 PM",
+          evening: "06:00 PM - 09:30 PM"
+        };
+
+        window.LocalHubStore.saveDecorScheduleItem({
+          title,
+          category,
+          date,
+          slotType,
+          timeSlot: slotLabels[slotType] || "09:00 AM - 12:00 PM",
+          assignedCrewId,
+          assignedCrewName,
+          location,
+          notes,
+          status: "scheduled"
+        });
+
+        toggleAddDecorModal(false);
+        document.getElementById("decorScheduleForm").reset();
+        renderDecorSchedule();
+        window.showToastNotification("🎨 New decor staging shift added to your schedule!");
+      };
+
+      window.cycleDecorStatus = function(id) {
+        const schedule = window.LocalHubStore.getDecorSchedule();
+        const item = schedule.find(s => s.id === id);
+        if (!item) return;
+
+        const cycle = ["scheduled", "in_progress", "ready", "completed"];
+        const nextIdx = (cycle.indexOf(item.status) + 1) % cycle.length;
+        window.LocalHubStore.updateDecorScheduleStatus(id, cycle[nextIdx]);
+        renderDecorSchedule();
+        window.showToastNotification(`Shift status updated to: ${cycle[nextIdx].toUpperCase().replace('_', ' ')}`);
+      };
+
+      window.removeDecorItem = function(id) {
+        window.LocalHubStore.deleteDecorScheduleItem(id);
+        renderDecorSchedule();
+        window.showToastNotification("Decor shift removed from schedule.", "info");
+      };
+
+      // -------------------------------------------------------------
+      // 2. MANPOWER & SERVICE CREW MATRIX (24/7 Persistent View)
+      // -------------------------------------------------------------
+      function renderManpowerMatrix() {
+        const roster = window.LocalHubStore.getProviderManpower();
+        const container = document.getElementById("crewRosterGrid");
+        const availBadge = document.getElementById("availableCrewCountBadge");
+        if (!container) return;
+
+        const availableCount = roster.filter(c => c.status === "available").length;
+        if (availBadge) {
+          availBadge.innerText = `${availableCount} Crew Available`;
+        }
+
+        let filtered = roster;
+        if (activeManpowerFilter !== "all") {
+          filtered = roster.filter(c => c.status === activeManpowerFilter);
+        }
+
+        const statusBadges = {
+          available: `<span class="delivery-verified-badge" style="font-size: 0.65rem;">🟢 Available</span>`,
+          on_site: `<span class="delivery-manual-badge" style="background: #e0f2fe; color: #0284c7; border-color: #7dd3fc; font-size: 0.65rem;">🔵 On-Site</span>`,
+          dispatched: `<span class="delivery-manual-badge" style="background: #fef3c7; color: #b45309; border-color: #fde68a; font-size: 0.65rem;">🚚 Dispatched</span>`,
+          on_break: `<span class="delivery-manual-badge" style="background: #f1f5f9; color: #64748b; border-color: #cbd5e1; font-size: 0.65rem;">☕ On Break</span>`
+        };
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;"><p>No staff matching "${activeManpowerFilter}".</p></div>`;
+          return;
+        }
+
+        container.innerHTML = filtered.map(crew => `
+          <div class="crew-card" id="crew_${crew.id}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem;">
+              <div>
+                <strong style="font-size: 0.85rem; color: var(--slate-900);">${crew.name}</strong><br>
+                <span style="font-size: 0.75rem; color: var(--slate-500);">${crew.role}</span>
+              </div>
+              ${statusBadges[crew.status] || statusBadges.available}
+            </div>
+
+            <div style="font-size: 0.75rem; color: var(--slate-600); margin: 0.35rem 0;">
+              <div>🚘 <strong>Assigned:</strong> ${crew.assignedVehicle}</div>
+              <div>📍 <strong>Location:</strong> ${crew.location}</div>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.35rem 0;">
+              ${(crew.skills || []).map(sk => `<span style="background: var(--slate-100); color: var(--slate-700); font-size: 0.65rem; padding: 0.1rem 0.35rem; border-radius: 3px;">${sk}</span>`).join("")}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; border-top: 1px solid var(--slate-100); padding-top: 0.35rem; margin-top: 0.35rem;">
+              <span class="battery-charge-pill">⚡ Charge ${crew.vehicleCharge || 90}%</span>
+              <button onclick="toggleCrewStatusManual('${crew.id}')" class="btn btn-sm btn-outline" style="font-size: 0.65rem; padding: 0.15rem 0.4rem;">
+                Shift Status
+              </button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      window.filterManpower = function(status, btn) {
+        activeManpowerFilter = status;
+        document.querySelectorAll("#crewFilterBar .filter-pill-btn").forEach(b => b.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+        renderManpowerMatrix();
+      };
+
+      window.triggerManualSimTick = function() {
+        const tick = window.LocalHubStore.simulateOperationsTick();
+        const tickerEl = document.getElementById("simTickerText");
+        if (tickerEl && tick) {
+          tickerEl.innerText = `⚡ ${tick.message}`;
+        }
+        renderManpowerMatrix();
+        window.showToastNotification("🔄 Operations telemetry and crew locations refreshed.");
+      };
+
+      window.toggleCrewStatusManual = function(crewId) {
+        const statuses = ["available", "dispatched", "on_site", "on_break"];
+        const current = window.LocalHubStore.getProviderManpower().find(c => c.id === crewId);
+        if (!current) return;
+
+        const nextIdx = (statuses.indexOf(current.status) + 1) % statuses.length;
+        window.LocalHubStore.updateCrewMemberStatus(crewId, statuses[nextIdx]);
+        renderManpowerMatrix();
+        window.showToastNotification(`${current.name} status shifted to ${statuses[nextIdx].toUpperCase().replace('_', ' ')}`);
+      };
+
+      function populateCrewSelectDropdown() {
+        const crewSelect = document.getElementById("schAssignedCrew");
+        if (!crewSelect) return;
+        const roster = window.LocalHubStore.getProviderManpower();
+        crewSelect.innerHTML = roster.map(c => `<option value="${c.id}">${c.name} (${c.role.split(" ")[0]})</option>`).join("");
+      }
+
+      // -------------------------------------------------------------
+      // 3. DECOR SUPPLIES WAREHOUSE INVENTORY
+      // -------------------------------------------------------------
+      function renderDecorWarehouse() {
+        const matrix = document.getElementById("decorInventoryMatrix");
+        if (!matrix) return;
+
+        matrix.innerHTML = Object.entries(decorStock).map(([item, qty]) => `
+          <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-sm); padding: 0.6rem; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: var(--slate-800);">${item}</strong><br>
+              <span style="color: var(--emerald-600); font-size: 0.75rem;">Stock: ${qty} units</span>
+            </div>
+            <div style="display: flex; gap: 0.25rem;">
+              <button onclick="adjustDecorQty('${item}', -1)" style="padding: 0.1rem 0.4rem; border: 1px solid var(--slate-300); background: white; border-radius: 3px; cursor: pointer;">-</button>
+              <button onclick="adjustDecorQty('${item}', 1)" style="padding: 0.1rem 0.4rem; border: 1px solid var(--slate-300); background: white; border-radius: 3px; cursor: pointer;">+</button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      window.adjustDecorQty = function(item, delta) {
+        decorStock[item] = Math.max(0, (decorStock[item] || 0) + delta);
+        renderDecorWarehouse();
+      };
+
+      // -------------------------------------------------------------
+      // 4. REAL-TIME CUSTOMER ORDERS DISPATCH & ACTIVE JOB
+      // -------------------------------------------------------------
+      function renderProviderDashboard() {
+        renderIncomingRequests();
+        renderActiveJob();
+        renderEarningsAndReviews();
+      }
+
+      function renderIncomingRequests() {
+        const container = document.getElementById("incomingRequestsList");
+        const countBadge = document.getElementById("incomingRequestsCountBadge");
+        if (!container) return;
+
+        const pendingOrders = allOrders.filter(o => o.status === "pending");
+
+        if (pendingOrders.length === 0) {
+          countBadge.style.display = "none";
+          container.innerHTML = `<div class="empty-state"><p>No pending customer job orders right now. Ready for incoming bookings!</p></div>`;
+          return;
+        }
+
+        countBadge.style.display = "inline-block";
+        countBadge.innerText = `${pendingOrders.length} New`;
+
+        container.innerHTML = pendingOrders.map(order => {
+          const suppliesText = order.supplies && order.supplies.length > 0
+            ? order.supplies.map(s => `${s.title} (x${s.quantity})`).join(", ")
+            : "None";
+
+          return `
+            <div style="border: 1.5px solid #10b981; border-radius: var(--radius-md); padding: 1rem; margin-bottom: 0.85rem; background: var(--white); box-shadow: var(--shadow-sm);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                <div>
+                  <span style="font-size: 0.7rem; font-weight: 700; color: #047857; text-transform: uppercase; letter-spacing: 0.05em; background: #dcfce7; padding: 0.15rem 0.4rem; border-radius: 3px;">⚡ LIVE INCOMING ORDER</span>
+                  <h4 style="margin: 0.35rem 0 0 0; font-size: 1.05rem; color: var(--slate-900);">${order.serviceTitle}</h4>
+                  <span style="font-size: 0.75rem; color: var(--slate-500);">Order #${order.orderNumber || order.id} • Customer: <strong>${order.customerName}</strong></span>
+                </div>
+                <strong style="font-size: 1.2rem; color: var(--emerald-600);">TK ${parseFloat(order.totalPrice || order.price || 0).toFixed(2)}</strong>
+              </div>
+
+              <div style="font-size: 0.8rem; color: var(--slate-600); margin-bottom: 0.5rem; background: var(--slate-50); padding: 0.5rem; border-radius: var(--radius-sm);">
+                <strong>Requested Slot:</strong> ${order.date} at ${order.time}<br>
+                <strong>Ordered Decor Supplies:</strong> ${suppliesText}
+              </div>
+
+              <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <button class="btn btn-sm btn-outline" style="color: var(--red-600); border-color: var(--red-200);" onclick="declineOrder('${order.id}')">Decline</button>
+                <button class="btn btn-sm btn-primary" onclick="acceptOrder('${order.id}')">Accept Request</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function renderActiveJob() {
+        const container = document.getElementById("activeJobContainer");
+        const activeBadge = document.getElementById("activeJobBadge");
+        if (!container) return;
+
+        const activeJob = allOrders.find(o => ["accepted", "dispatched", "executing", "delivered_pending_confirmation", "delivered"].includes(o.status));
+
+        if (!activeJob) {
+          activeBadge.style.display = "none";
+          container.innerHTML = `
+            <div class="empty-state">
+              <p>You have no active jobs in progress.</p>
+              <span style="font-size: 0.75rem; color: var(--slate-400);">Accept an incoming request from the panel above to get started!</span>
+            </div>
+          `;
+          return;
+        }
+
+        activeBadge.style.display = "inline-block";
+        activeBadge.innerText = activeJob.status.toUpperCase().replace(/_/g, ' ');
+
+        const suppliesText = activeJob.supplies && activeJob.supplies.length > 0
+          ? activeJob.supplies.map(s => `${s.title} x${s.quantity} (TK ${s.lineTotal ? s.lineTotal.toFixed(2) : '0.00'})`).join("<br>• ")
+          : "None";
+
+        const customerAddressStr = activeJob.deliveryAddress || (activeJob.addressDetails ? `${activeJob.addressDetails}, ${activeJob.addressArea || ''}, ${activeJob.addressDivision || ''}, Bangladesh` : 'Dhaka, Bangladesh');
+
+        let actionButtonHtml = "";
+        let handoverVerificationBanner = "";
+
+        if (activeJob.status === "accepted") {
+          actionButtonHtml = `<button class="btn btn-primary btn-sm" onclick="progressJobStatus('${activeJob.id}', 'dispatched')">🚚 Dispatch Delivery Fleet & Workers</button>`;
+        } else if (activeJob.status === "dispatched") {
+          actionButtonHtml = `<button class="btn btn-primary btn-sm" onclick="progressJobStatus('${activeJob.id}', 'executing')">⚙️ Mark In-Transit / Rigging</button>`;
+        } else if (activeJob.status === "executing") {
+          actionButtonHtml = `<button class="btn btn-primary btn-sm" style="background: #f59e0b; color: white;" onclick="progressJobStatus('${activeJob.id}', 'delivered_pending_confirmation')">📍 Mark At Doorstep (Awaiting Delivery Handover)</button>`;
+        } else if (activeJob.status === "delivered_pending_confirmation") {
+          handoverVerificationBanner = `
+            <div style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 6px; padding: 0.65rem; margin-top: 0.75rem; font-size: 0.8rem; color: #92400e;">
+              <div style="font-weight: 700; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.25rem;">
+                ⏳ Deal Finalization Locked
+              </div>
+              <div>
+                The deliveryman must physically hand over the parcel and tap <strong>"Confirm Handover"</strong> in the Delivery Console before you can finalize the deal.
+              </div>
+              <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
+                <a href="./delivery.html" class="btn btn-sm btn-primary" style="background: #f59e0b; color: white; text-decoration: none; font-size: 0.75rem; padding: 0.25rem 0.6rem;">
+                  🚚 Go to Delivery Fleet Console
+                </a>
+              </div>
+            </div>
+          `;
+          actionButtonHtml = `
+            <button class="btn btn-sm btn-secondary" style="opacity: 0.6; cursor: not-allowed;" title="Awaiting Deliveryman Handover Tap" disabled>
+              🔒 Finalize Deal (Awaiting Handover)
+            </button>
+          `;
+        } else if (activeJob.status === "delivered") {
+          handoverVerificationBanner = `
+            <div style="background: #ecfdf5; border: 1.5px solid #10b981; border-radius: 6px; padding: 0.65rem; margin-top: 0.75rem; font-size: 0.8rem; color: #065f46;">
+              <div style="font-weight: 700; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.25rem;">
+                ✔ Delivery Handover Verified by Deliveryman!
+              </div>
+              <div>
+                ${activeJob.deliverymanConfirmationNotes ? `Notes: <em>"${activeJob.deliverymanConfirmationNotes}"</em>` : 'Deliveryman has tapped and verified parcel handover. You may now finalize the deal and settle revenue.'}
+              </div>
+            </div>
+          `;
+          actionButtonHtml = `
+            <button class="btn btn-primary btn-sm" style="background-color: var(--emerald-600); font-weight: 700;" onclick="progressJobStatus('${activeJob.id}', 'paid')">
+              💳 Finalize Deal & Settle Revenue (TK ${parseFloat(activeJob.totalPrice || activeJob.price || 0).toFixed(2)})
+            </button>
+          `;
+        }
+
+        container.innerHTML = `
+          <div style="border: 2px solid var(--emerald-500); background-color: var(--emerald-50); padding: 1rem; border-radius: var(--radius-md);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <div>
+                <strong style="font-size: 1.1rem; color: var(--emerald-900);">${activeJob.serviceTitle}</strong><br>
+                <span style="font-size: 0.8rem; color: var(--emerald-700);">Order #${activeJob.orderNumber || activeJob.id} • ${activeJob.customerName} (${activeJob.customerEmail || ''})</span>
+              </div>
+              <strong style="font-size: 1.2rem; color: var(--emerald-800);">TK ${parseFloat(activeJob.totalPrice || activeJob.price || 0).toFixed(2)}</strong>
+            </div>
+
+            <div style="font-size: 0.8rem; color: var(--slate-700); background: var(--white); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--emerald-200); margin: 0.75rem 0;">
+              <div style="margin-bottom: 0.4rem;">
+                📍 <strong>Delivery Address:</strong> ${customerAddressStr}
+                ${activeJob.customerPhone ? `<br>📞 <strong>Phone:</strong> <a href="tel:${activeJob.customerPhone}" style="color: var(--emerald-700);">${activeJob.customerPhone}</a>` : ''}
+                ${activeJob.addressLandmark ? `<br><small style="color: #15803d;">🏷️ Landmark: ${activeJob.addressLandmark}</small>` : ''}
+              </div>
+              <div style="border-top: 1px dashed var(--slate-200); padding-top: 0.4rem;">
+                <strong>Scheduled Slot:</strong> ${activeJob.date} at ${activeJob.time}<br>
+                <strong>Ordered Add-on Decor Supplies:</strong><br>
+                • ${suppliesText}
+              </div>
+            </div>
+
+            ${handoverVerificationBanner}
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--emerald-200); padding-top: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+              <span style="font-size: 0.8rem; color: var(--emerald-800);">Status: <strong style="text-transform: uppercase;">${activeJob.status.replace(/_/g, ' ')}</strong></span>
+              ${actionButtonHtml}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderEarningsAndReviews() {
+        const completedJobs = allOrders.filter(o => o.status === "paid" || o.status === "delivered");
+        
+        let grossRev = 0;
+        completedJobs.forEach(o => grossRev += parseFloat(o.totalPrice || o.price || 0));
+        
+        const platformFees = completedJobs.length * 5.00;
+        const netRev = Math.max(0, grossRev - platformFees);
+
+        const compEl = document.getElementById("completedJobsMetric");
+        const totRevEl = document.getElementById("totalRevenueMetric");
+        const netRevEl = document.getElementById("netRevenueMetric");
+        if (compEl) compEl.innerText = completedJobs.length;
+        if (totRevEl) totRevEl.innerText = `TK ${grossRev.toFixed(2)}`;
+        if (netRevEl) netRevEl.innerText = `TK ${netRev.toFixed(2)}`;
+
+        // Reviews list
+        const reviewsContainer = document.getElementById("providerFeedbackList");
+        if (!reviewsContainer) return;
+
+        const reviewedOrders = allOrders.filter(o => o.rating && o.rating > 0);
+
+        if (reviewedOrders.length === 0) {
+          reviewsContainer.innerHTML = `<div class="empty-state"><p>No customer reviews submitted yet.</p></div>`;
+          return;
+        }
+
+        reviewsContainer.innerHTML = reviewedOrders.map(o => `
+          <div style="padding: 0.65rem; border: 1px solid var(--slate-200); border-radius: var(--radius-sm); margin-bottom: 0.5rem; background: var(--white);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+              <strong style="font-size: 0.8rem;">${o.customerName || 'Verified Customer'}</strong>
+              <span style="color: var(--amber-500); font-size: 0.85rem;">${'★'.repeat(o.rating)}</span>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--slate-600); margin: 0;">"${o.reviewText || 'Great service!'}"</p>
+            <span style="font-size: 0.65rem; color: var(--slate-400);">${o.serviceTitle}</span>
+          </div>
+        `).join("");
+      }
+
+      window.acceptOrder = async function(orderId) {
+        const user = window.LocalHubStore.getCurrentUser();
+        await window.LocalHubStore.updateBookingStatus(orderId, "accepted", user ? user.uid : null);
+        window.showToastNotification("Order accepted! Job moved to Active Panel.");
+      };
+
+      window.declineOrder = async function(orderId) {
+        const user = window.LocalHubStore.getCurrentUser();
+        await window.LocalHubStore.updateBookingStatus(orderId, "canceled", user ? user.uid : null);
+        window.showToastNotification("Order declined.", "info");
+      };
+
+      window.progressJobStatus = async function(orderId, nextStatus) {
+        const user = window.LocalHubStore.getCurrentUser();
+        await window.LocalHubStore.updateBookingStatus(orderId, nextStatus, user ? user.uid : null);
+        window.showToastNotification(`Job status updated to: ${nextStatus.toUpperCase().replace(/_/g, ' ')}`);
+      };
+
+      window.togglePublishForm = function() {
+        const form = document.getElementById("publishFormContainer");
+        if (form) form.style.display = form.style.display === "none" ? "block" : "none";
+      };
+
+      window.togglePubTypeFields = function(type) {
+        const catGroup = document.getElementById("pubCatGroup");
+        const stockGroup = document.getElementById("pubStockGroup");
+        if (type === "supply") {
+          if (catGroup) catGroup.style.display = "none";
+          if (stockGroup) stockGroup.style.display = "block";
+        } else {
+          if (catGroup) catGroup.style.display = "block";
+          if (stockGroup) stockGroup.style.display = "none";
+        }
+      };
+
+      window.handlePublishItem = async function(e) {
+        e.preventDefault();
+        const user = window.LocalHubStore.getCurrentUser();
+        if (!user) return;
+
+        const type = document.getElementById("pubType").value;
+        const title = document.getElementById("pubTitle").value.trim();
+        const category = document.getElementById("pubCategory").value;
+        const price = parseFloat(document.getElementById("pubPrice").value) || 0;
+        const unit = document.getElementById("pubUnit").value.trim();
+        const description = document.getElementById("pubDescription").value.trim();
+        const iconClass = document.getElementById("pubIcon").value.trim() || "✨";
+        const stock = parseInt(document.getElementById("pubStock").value) || 50;
+
+        const submitBtn = document.getElementById("pubSubmitBtn");
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Publishing to Firestore...";
+
+        try {
+          if (type === "service") {
+            const res = await window.LocalHubStore.createService({
+              title,
+              category,
+              price,
+              unit,
+              description,
+              iconClass,
+              providerId: user.uid
+            });
+            if (res.success) {
+              window.showToastNotification(`Service "${title}" published to Firestore catalog!`);
+            } else {
+              window.showToastNotification("Error publishing service: " + res.message, "info");
+            }
+          } else {
+            const res = await window.LocalHubStore.createSupply({
+              title,
+              price,
+              unit,
+              description,
+              iconClass,
+              stock,
+              providerId: user.uid
+            });
+            if (res.success) {
+              window.showToastNotification(`Supply "${title}" published to Firestore catalog!`);
+            } else {
+              window.showToastNotification("Error publishing supply: " + res.message, "info");
+            }
+          }
+          document.querySelector("#publishFormContainer form").reset();
+          document.getElementById("publishFormContainer").style.display = "none";
+        } catch (err) {
+          window.showToastNotification("Publish error: " + err.message, "info");
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Save to Firestore Collection";
+        }
+      };
+    </script>
+  </body>
+</html>

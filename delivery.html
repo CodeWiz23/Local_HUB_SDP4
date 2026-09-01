@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delivery Fleet & Handover Center — LocalHub</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar" id="mainNavbar">
+      <div class="navbar-container">
+        <a href="./index.html" class="logo" id="logoLink">
+          <div class="logo-icon-svg">
+            <div class="logo-icon-inner">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <span class="logo-text">LocalHub</span>
+        </a>
+
+        <div class="nav-links" id="navAuthActions">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Delivery Layout -->
+    <main class="dashboard-layout" style="max-width: 1240px; margin: 1.5rem auto; padding: 0 1.5rem;">
+      <section style="width: 100%;">
+        <!-- Hero Header -->
+        <div class="deliveryman-hero-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div class="review-author-avatar" style="background: linear-gradient(135deg, #f59e0b, #d97706); width: 56px; height: 56px; font-size: 1.25rem; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);">
+                🚚
+              </div>
+              <div>
+                <h1 style="color: #ffffff; font-size: 1.5rem; margin-bottom: 0.25rem;" id="deliverymanNameDisplay">Alex Vance • Fleet Dispatcher #04</h1>
+                <p style="color: #94a3b8; font-size: 0.85rem; margin: 0;">
+                  Assigned Route: <strong style="color: #38bdf8;">Zone A & Greenwood Corridor</strong> • Shift Status: <span class="delivery-verified-badge" style="font-size: 0.7rem;">Active On Duty</span>
+                </p>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <div class="metric-card" style="background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.12); padding: 0.6rem 1rem;">
+                <span style="color: #94a3b8; font-size: 0.75rem;">Completed Today</span>
+                <h3 id="delivCompletedCount" style="color: #ffffff; font-size: 1.2rem; margin: 0;">4</h3>
+              </div>
+              <div class="metric-card" style="background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.12); padding: 0.6rem 1rem;">
+                <span style="color: #94a3b8; font-size: 0.75rem;">Vehicle Battery</span>
+                <h3 style="color: #34d399; font-size: 1.2rem; margin: 0;">⚡ 91%</h3>
+              </div>
+              <div class="metric-card" style="background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.12); padding: 0.6rem 1rem;">
+                <span style="color: #94a3b8; font-size: 0.75rem;">On-Time Rating</span>
+                <h3 style="color: #f59e0b; font-size: 1.2rem; margin: 0;">★ 4.98</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Manual Delivery Verification Queue (High Priority) -->
+        <div class="dashboard-panel" style="border-left: 4px solid #f59e0b;">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">📍</span>
+              <strong>Manual Delivery Confirmations & Handover Queue</strong>
+            </div>
+            <span id="pendingVerificationsCount" class="delivery-manual-badge">0 Pending Verification</span>
+          </div>
+
+          <p style="font-size: 0.85rem; color: var(--slate-600); margin-bottom: 1rem;">
+            <strong>Rule:</strong> Deliveries marked by customers or dispatched require your <em>manual tap</em> to confirm physical handover before transitioning to completed status.
+          </p>
+
+          <div id="manualConfirmationContainer" class="delivery-jobs-grid">
+            <!-- Populated via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Section: Dispatched & In-Transit Jobs -->
+        <div class="dashboard-panel" style="margin-top: 1.5rem;">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">📦</span>
+              <strong>All Assigned Neighborhood Orders & Supplies Runs</strong>
+            </div>
+            <span id="allAssignedCount" style="font-size: 0.8rem; color: var(--slate-500);">Live synchronization</span>
+          </div>
+
+          <div id="allAssignedJobsContainer" class="delivery-jobs-grid" style="margin-top: 1rem;">
+            <!-- Populated via JavaScript -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal for Manual Delivery Confirmation -->
+    <div id="deliveryConfirmModal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 2000; align-items: center; justify-content: center; padding: 1rem;">
+      <div class="modal" style="max-width: 480px; width: 100%; background: var(--white); border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: var(--shadow-xl); border: 1px solid var(--slate-200);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 style="margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>✍️</span> Verify Delivery Handover
+          </h3>
+          <button onclick="closeDeliveryModal()" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--slate-400);">&times;</button>
+        </div>
+
+        <div id="modalOrderSummary" style="background: var(--slate-50); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--slate-200); margin-bottom: 1rem; font-size: 0.85rem;">
+          <!-- Populated dynamically -->
+        </div>
+
+        <form onsubmit="handleFinalizeManualDelivery(event)">
+          <input type="hidden" id="modalOrderId" />
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="font-size: 0.85rem; font-weight: 600;">Handover Verification Note</label>
+            <textarea id="modalDeliveryNotes" class="form-control" rows="2" placeholder="e.g. Handed directly to customer at front entrance. Visual item check verified." required>Handover verified with customer. Package inspected in pristine condition.</textarea>
+          </div>
+
+          <div style="background: #ecfdf5; border: 1px solid #10b981; padding: 0.75rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.8rem; color: #065f46;">
+            ✔ <strong>Manual Tap Signature:</strong> Tapping confirm will record your verified deliveryman timestamp and notify the customer and provider portal instantly.
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="button" onclick="closeDeliveryModal()" class="btn btn-outline" style="flex: 1;">Cancel</button>
+            <button type="submit" id="btnConfirmHandoverModal" class="btn btn-primary" style="flex: 2; background: linear-gradient(135deg, #10b981, #059669); color: white;">
+              ✔ Confirm & Finalize Handover
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="margin-top: 3rem; padding: 1.5rem 2rem; background: var(--slate-900); color: var(--slate-400); font-size: 0.85rem; border-top: 1px solid var(--slate-800);">
+      <div style="max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <strong style="color: var(--white);">LocalHub Delivery Logistics Network</strong> &copy; 2026. All rights reserved.
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button class="theme-toggle-btn" onclick="window.toggleTheme()">🌙 Switch Theme</button>
+          <a href="./customer.html" style="color: var(--emerald-400);">Customer Portal</a>
+          <a href="./provider.html" style="color: var(--slate-300);">Provider Hub</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Core App Imports -->
+    <script type="module" src="./app.js"></script>
+    <script type="module">
+      import { LocalHubStore, showToastNotification } from "./app.js";
+
+      let allOrders = [];
+      let activeModalOrderId = null;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const user = LocalHubStore.getCurrentUser();
+        if (user && user.role === "customer") {
+          // Restrict customer access - delivery fleet is only for delivery personnel
+          alert("Access Restricted: The delivery fleet dispatch console is for delivery personnel only.");
+          window.location.href = "./customer.html";
+          return;
+        }
+
+        if (user && document.getElementById("deliverymanNameDisplay")) {
+          document.getElementById("deliverymanNameDisplay").innerText = `${user.name || user.email} • Delivery Fleet`;
+        }
+
+        // Subscribe to real-time orders
+        LocalHubStore.listenToOrders(user || { uid: "deliv-guest", role: "delivery" }, (orders) => {
+          allOrders = orders;
+          renderDeliveryQueue();
+        });
+      });
+
+      function renderDeliveryQueue() {
+        const manualContainer = document.getElementById("manualConfirmationContainer");
+        const allContainer = document.getElementById("allAssignedJobsContainer");
+        const pendingBadge = document.getElementById("pendingVerificationsCount");
+        const completedMetric = document.getElementById("delivCompletedCount");
+
+        // Filter orders requiring manual delivery confirmation
+        const pendingConfirmOrders = allOrders.filter(o => 
+          o.status === "delivered_pending_confirmation" || 
+          o.status === "out_for_delivery" || 
+          o.status === "dispatched" || 
+          o.status === "executing"
+        );
+
+        const finalizedOrders = allOrders.filter(o => o.status === "delivered" || o.status === "paid");
+        if (completedMetric) {
+          completedMetric.innerText = finalizedOrders.length || 4;
+        }
+
+        if (pendingBadge) {
+          const awaitingTapCount = allOrders.filter(o => o.status === "delivered_pending_confirmation").length;
+          pendingBadge.innerText = `${awaitingTapCount} Pending Manual Tap`;
+          pendingBadge.style.backgroundColor = awaitingTapCount > 0 ? "#fef3c7" : "#ecfdf5";
+          pendingBadge.style.color = awaitingTapCount > 0 ? "#b45309" : "#065f46";
+        }
+
+        // 1. Render Manual Confirmation Queue
+        if (pendingConfirmOrders.length === 0) {
+          manualContainer.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1; padding: 2rem;">
+              <p>✨ No orders currently awaiting delivery verification.</p>
+              <span style="font-size: 0.8rem; color: var(--slate-400);">When customers receive goods or orders are dispatched, they will appear here for manual confirmation.</span>
+            </div>
+          `;
+        } else {
+          manualContainer.innerHTML = pendingConfirmOrders.map(order => {
+            const isWaitingConfirmation = order.status === "delivered_pending_confirmation";
+            const suppliesText = order.supplies && order.supplies.length > 0
+              ? order.supplies.map(s => `${s.title} (x${s.quantity})`).join(", ")
+              : "No add-on supplies";
+
+            return `
+              <div class="delivery-job-card ${isWaitingConfirmation ? 'action-required' : ''}" id="card_${order.id}">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                    <div>
+                      <span class="delivery-manual-badge" style="font-size: 0.7rem; margin-bottom: 0.25rem;">
+                        ${isWaitingConfirmation ? '⚠️ Customer Waiting for Tap' : '🚚 Out for Delivery'}
+                      </span>
+                      <h3 style="font-size: 1.1rem; margin: 0.25rem 0; color: var(--slate-900);">${order.serviceTitle}</h3>
+                      <span style="font-size: 0.75rem; color: var(--slate-500);">Order #${order.orderNumber || order.id} • ${order.date || 'Today'} (${order.time || 'Immediate'})</span>
+                    </div>
+                    <strong style="color: var(--emerald-600); font-size: 1.1rem;">TK ${parseFloat(order.totalPrice || order.price || 0).toFixed(2)}</strong>
+                  </div>
+
+                  <div class="delivery-route-simulator" style="margin: 0.75rem 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; align-items: center;">
+                      <span>👤 <strong>${order.customerName || 'Customer'}</strong></span>
+                      <a href="tel:${order.customerPhone || '+8801700000000'}" style="color: var(--emerald-600); font-weight: 700; text-decoration: underline; font-size: 0.8rem;">
+                        📞 Call: ${order.customerPhone || '+880 17XX-XXXXXX'}
+                      </a>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 0.4rem 0.6rem; border-radius: 4px; margin-bottom: 0.35rem;">
+                      📍 <strong>Destination:</strong> ${order.deliveryAddress || (order.addressDetails ? `${order.addressDetails}, ${order.addressArea || ''}, ${order.addressDivision || ''}, Bangladesh` : 'Gulshan-2, Dhaka, Bangladesh')}
+                      ${order.addressLandmark ? `<br><small style="color: #15803d;">🏷️ Landmark: <em>${order.addressLandmark}</em></small>` : ''}
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--slate-600); margin-top: 0.25rem;">
+                      📦 <strong>Parcel Supplies:</strong> ${suppliesText}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  ${isWaitingConfirmation ? `
+                    <button onclick="openDeliveryModal('${order.id}')" class="delivery-confirm-action-btn" id="btn_verify_${order.id}">
+                      ✍️ Confirm Handover & Finalize Delivery (Manual Tap)
+                    </button>
+                  ` : `
+                    <div style="display: flex; gap: 0.5rem;">
+                      <button onclick="openDeliveryModal('${order.id}')" class="btn btn-sm btn-primary" style="flex: 1; background: var(--emerald-600); color: white;">
+                        ✔ Manual Handover Confirm
+                      </button>
+                      <button onclick="simulateArrivalNotice('${order.id}')" class="btn btn-sm btn-outline" style="flex: 1;">
+                        📍 At Doorstep
+                      </button>
+                    </div>
+                  `}
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
+
+        // 2. Render all assigned
+        if (allOrders.length === 0) {
+          allContainer.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;"><p>No history available.</p></div>`;
+        } else {
+          allContainer.innerHTML = allOrders.slice(0, 6).map(order => `
+            <div class="live-review-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <strong>${order.serviceTitle}</strong>
+                <span class="${order.status === 'delivered' || order.status === 'paid' ? 'delivery-verified-badge' : 'delivery-manual-badge'}">
+                  ${order.status.toUpperCase()}
+                </span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--slate-500); margin-bottom: 0.25rem;">
+                Order #${order.orderNumber || order.id} • Customer: ${order.customerName || 'Customer'}
+              </p>
+              ${order.deliveryConfirmedByDeliveryman ? `
+                <div style="font-size: 0.75rem; color: #059669; background: #ecfdf5; padding: 0.35rem 0.6rem; border-radius: 4px; margin-top: 0.5rem;">
+                  ✔ Verified by Deliveryman: ${order.deliverymanConfirmationNotes || 'Handover confirmed.'}
+                </div>
+              ` : ''}
+            </div>
+          `).join("");
+        }
+      }
+
+      window.openDeliveryModal = function(orderId) {
+        activeModalOrderId = orderId;
+        const order = allOrders.find(o => o.id === orderId);
+        if (!order) return;
+
+        document.getElementById("modalOrderId").value = orderId;
+        const address = order.deliveryAddress || (order.addressDetails ? `${order.addressDetails}, ${order.addressArea || ''}, ${order.addressDivision || ''}` : 'Dhaka, Bangladesh');
+        document.getElementById("modalOrderSummary").innerHTML = `
+          <strong style="color: var(--slate-900); font-size: 0.95rem;">${order.serviceTitle}</strong> (Order #${order.orderNumber || order.id})<br>
+          <div style="margin-top: 0.35rem; color: var(--slate-600);">
+            👤 <strong>Customer:</strong> ${order.customerName || 'Customer'} • 📞 <strong>${order.customerPhone || 'N/A'}</strong><br>
+            📍 <strong>Address:</strong> ${address}
+            ${order.addressLandmark ? `<br><small style="color: #166534;">🏷️ Landmark: ${order.addressLandmark}</small>` : ''}
+          </div>
+          <div style="margin-top: 0.35rem; padding-top: 0.35rem; border-top: 1px solid var(--slate-200); font-weight: 700; color: var(--emerald-700);">
+            💰 Total Payment to Collect/Settle: TK ${parseFloat(order.totalPrice || order.price || 0).toFixed(2)}
+          </div>
+        `;
+        document.getElementById("deliveryConfirmModal").style.display = "flex";
+      };
+
+      window.closeDeliveryModal = function() {
+        document.getElementById("deliveryConfirmModal").style.display = "none";
+      };
+
+      window.handleFinalizeManualDelivery = async function(e) {
+        e.preventDefault();
+        const orderId = document.getElementById("modalOrderId").value;
+        const notes = document.getElementById("modalDeliveryNotes").value.trim();
+        const btn = document.getElementById("btnConfirmHandoverModal");
+
+        btn.disabled = true;
+        btn.innerText = "Verifying Handover...";
+
+        try {
+          const user = LocalHubStore.getCurrentUser();
+          await LocalHubStore.manualConfirmDelivery(orderId, notes, user ? user.uid : "deliv-alex");
+          showToastNotification("✔ Delivery verified & completed successfully! Customer can now rate and review.");
+          closeDeliveryModal();
+        } catch (err) {
+          showToastNotification("Error finalizing delivery: " + err.message, "info");
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "✔ Confirm & Finalize Handover";
+        }
+      };
+
+      window.simulateArrivalNotice = async function(orderId) {
+        await LocalHubStore.markCustomerReceived(orderId);
+        showToastNotification("📍 Arrived at doorstep. Order flagged as pending manual deliveryman confirmation.");
+      };
+    </script>
+  </body>
+</html>

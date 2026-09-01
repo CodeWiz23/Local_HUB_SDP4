@@ -1,0 +1,1279 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Dashboard — LocalHub</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .timeline-container {
+        margin: 1.25rem 0;
+        position: relative;
+      }
+
+      .timeline-progress-bar {
+        height: 6px;
+        background-color: var(--slate-200);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+      }
+
+      .timeline-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--emerald-500), var(--emerald-400));
+        transition: width 0.4s ease;
+      }
+
+      .timeline-steps {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.25rem;
+      }
+
+      .timeline-step {
+        flex: 1;
+        text-align: center;
+        font-size: 0.7rem;
+        color: var(--slate-400);
+        position: relative;
+      }
+
+      .timeline-step.active {
+        color: var(--emerald-600);
+        font-weight: 600;
+      }
+
+      .timeline-step.completed {
+        color: var(--slate-700);
+      }
+
+      .timeline-step-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background-color: var(--slate-300);
+        margin: 0 auto 0.25rem auto;
+        border: 2px solid var(--white);
+        box-shadow: 0 0 0 1px var(--slate-300);
+      }
+
+      .timeline-step.active .timeline-step-dot {
+        background-color: var(--emerald-500);
+        box-shadow: 0 0 0 3px var(--emerald-100);
+      }
+
+      .timeline-step.completed .timeline-step-dot {
+        background-color: var(--slate-700);
+      }
+
+      .add-on-item-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem;
+        border: 1px solid var(--slate-200);
+        border-radius: var(--radius-sm);
+        margin-bottom: 0.5rem;
+        background-color: var(--white);
+      }
+
+      .add-on-item-row:hover {
+        border-color: var(--emerald-400);
+      }
+
+      .printable-receipt {
+        background: var(--white);
+        border: 1px solid var(--slate-300);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        color: var(--slate-900);
+        font-family: var(--font-primary);
+      }
+
+      .receipt-header {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 2px dashed var(--slate-300);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .receipt-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.85rem;
+      }
+
+      .receipt-table th, .receipt-table td {
+        padding: 0.5rem;
+        text-align: left;
+        border-bottom: 1px solid var(--slate-100);
+      }
+
+      .receipt-table th {
+        background-color: var(--slate-50);
+        color: var(--slate-600);
+      }
+
+      .receipt-summary-line {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        padding: 0.25rem 0;
+      }
+
+      .paid-stamp {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border: 2px solid var(--emerald-600);
+        color: var(--emerald-600);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-radius: var(--radius-sm);
+        transform: rotate(-5deg);
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="navbar-container">
+        <a href="./index.html" class="logo">
+          <div class="logo-icon-svg">
+            <div class="logo-icon-inner">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <span class="logo-text">LocalHub</span>
+        </a>
+        <div class="nav-links" id="navAuthActions">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="dashboard-layout">
+      <!-- Left Column: Service Catalog & Actions -->
+      <section class="dashboard-main-col">
+        <div class="dashboard-title-bar">
+          <div>
+            <h1 id="customerWelcomeTitle">Hello, Valued Customer</h1>
+            <p style="color: var(--slate-500); font-size: 0.9rem;">Book local certified services or purchase add-on decor & supply inventory in your area.</p>
+          </div>
+          <div class="user-role-badge alert alert-success" style="margin-bottom: 0; padding: 0.35rem 0.75rem; font-weight: 600; font-size: 0.8rem; background-color: var(--emerald-50); color: var(--emerald-700); border-color: var(--emerald-200);">
+            Active Customer Profile
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem;"></div>
+
+        <!-- Service Catalog Section -->
+        <div class="dashboard-panel" id="catalogPanel">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <span>🛠️ Marketplace & Decor Supply Catalog</span>
+            <div style="position: relative; max-width: 250px; flex: 1;">
+              <input type="text" id="catalogSearch" oninput="filterCatalog()" placeholder="Search services & decor..." style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--slate-200); width: 100%;" />
+            </div>
+          </div>
+
+          <!-- Filters and Sorting Header -->
+          <div class="catalog-filters" style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="filter-btn active" id="filter-all" onclick="setCatalogCategory('all')">All Options</button>
+              <button class="filter-btn" id="filter-home-decor" onclick="setCatalogCategory('home-decor')">Home Decoration</button>
+              <button class="filter-btn" id="filter-cleaning" onclick="setCatalogCategory('cleaning')">Professional Sweepers</button>
+              <button class="filter-btn" id="filter-car-rentals" onclick="setCatalogCategory('car-rentals')">Car Rentals</button>
+              <button class="filter-btn" id="filter-decor-supplies" onclick="setCatalogCategory('decor-supplies')" style="background-color: var(--emerald-50); border-color: var(--emerald-200); color: var(--emerald-800);">🛍️ Decor & Supply Store</button>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 0.25rem;">
+              <label for="catalogSort" style="font-size: 0.8rem; font-weight: 600; color: var(--slate-600);">Sort By:</label>
+              <select id="catalogSort" onchange="setCatalogSort(this.value)" style="padding: 0.4rem 0.6rem; font-size: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--slate-200); background: var(--white); color: var(--slate-800); cursor: pointer;">
+                <option value="default">Featured / Default</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="rating-desc">Highest Rated</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Services / Supplies Grid -->
+          <div class="services-catalog-grid" id="servicesGrid">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Active Tracking, Reviews, Bills -->
+      <aside class="dashboard-side-col">
+        <!-- Panel 1: Real-Time Order Tracker Timeline -->
+        <div class="dashboard-panel" id="trackingPanel">
+          <div class="panel-title">
+            <span>📦 Real-Time Order Tracker</span>
+            <span id="activeOrderBadge" class="request-meta-badge" style="display: none;">Live</span>
+          </div>
+
+          <div id="trackingContent">
+            <!-- Dynamically rendered active order or empty state -->
+            <div class="empty-state">
+              <p>No active jobs in progress.</p>
+              <span style="font-size: 0.75rem; color: var(--slate-400);">Choose a service or decor supply item from the catalog to get started!</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Review/Feedback Section (Shows conditionally) -->
+        <div class="dashboard-panel" id="reviewPanel" style="display: none;">
+          <div class="panel-title">
+            <span>⭐ Share Your Feedback</span>
+          </div>
+          <div>
+            <p style="font-size: 0.85rem; color: var(--slate-600); margin-bottom: 0.75rem;">Rate your provider and job execution quality.</p>
+            <div class="stars-selector" id="ratingStarsSelector" style="font-size: 1.5rem; color: var(--amber-500); cursor: pointer; margin-bottom: 0.75rem;">
+              <span class="star-input" data-rating="1" onclick="setStarRating(1)">★</span>
+              <span class="star-input" data-rating="2" onclick="setStarRating(2)">★</span>
+              <span class="star-input" data-rating="3" onclick="setStarRating(3)">★</span>
+              <span class="star-input" data-rating="4" onclick="setStarRating(4)">★</span>
+              <span class="star-input" data-rating="5" onclick="setStarRating(5)">★</span>
+            </div>
+            <div class="form-group">
+              <label for="reviewComment">Review comments</label>
+              <textarea id="reviewComment" class="form-control" rows="3" placeholder="Tell us how the service provider or decor supplies were..."></textarea>
+            </div>
+            <button class="btn btn-primary btn-sm" id="submitReviewBtn" onclick="submitActiveReview()" style="width: 100%;">Submit Feedback</button>
+          </div>
+        </div>
+
+        <!-- Panel 3: Live Website & Platform Review (Shows on Landing Page in Real Time) -->
+        <div class="dashboard-panel" id="websiteReviewPanel" style="border: 1.5px solid #10b981; background: #fafdfc;">
+          <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="font-size: 1.15rem;">🌐</span>
+              <strong style="color: #065f46;">Website & Platform Live Review</strong>
+            </div>
+            <span class="delivery-verified-badge" style="font-size: 0.65rem; background: #ecfdf5; color: #047857; border-color: #a7f3d0;">
+              ⚡ Live on Home Page
+            </span>
+          </div>
+
+          <div style="margin-top: 0.5rem;">
+            <p style="font-size: 0.8rem; color: var(--slate-600); margin-bottom: 0.65rem;">
+              Share your thoughts on the LocalHub marketplace experience. Your live testimonial & rating will be published to our main landing page in real time!
+            </p>
+
+            <label style="font-size: 0.75rem; font-weight: 700; color: var(--slate-700); display: block; margin-bottom: 0.25rem;">Select Website Star Rating</label>
+            <div class="stars-selector" id="webRatingStarsSelector" style="font-size: 1.6rem; color: #f59e0b; cursor: pointer; margin-bottom: 0.5rem; display: flex; gap: 0.25rem;">
+              <span class="web-star-btn active" data-rating="1" onclick="setWebStarRating(1)">★</span>
+              <span class="web-star-btn active" data-rating="2" onclick="setWebStarRating(2)">★</span>
+              <span class="web-star-btn active" data-rating="3" onclick="setWebStarRating(3)">★</span>
+              <span class="web-star-btn active" data-rating="4" onclick="setWebStarRating(4)">★</span>
+              <span class="web-star-btn active" data-rating="5" onclick="setWebStarRating(5)">★</span>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0.5rem;">
+              <label for="webReviewNeighborhood" style="font-size: 0.75rem; font-weight: 600;">Your Neighborhood / District</label>
+              <select id="webReviewNeighborhood" class="form-control" style="font-size: 0.8rem; padding: 0.35rem 0.6rem;">
+                <option value="Greenwood District">Greenwood District</option>
+                <option value="Silverwood Heights">Silverwood Heights</option>
+                <option value="Oakridge Gardens">Oakridge Gardens</option>
+                <option value="Downtown Central">Downtown Central</option>
+                <option value="Westside Hills">Westside Hills</option>
+                <option value="Pinecrest Valley">Pinecrest Valley</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0.65rem;">
+              <label for="webReviewComment" style="font-size: 0.75rem; font-weight: 600; display: flex; justify-content: space-between;">
+                <span>Type Website Feedback</span>
+                <span id="webCharCount" style="color: var(--slate-400); font-weight: normal;">0 / 280</span>
+              </label>
+              <textarea id="webReviewComment" class="form-control" rows="3" oninput="updateWebCharCount(this)" placeholder="e.g., LocalHub made booking home cleaners and car rentals so easy! The dispatch is fast and reliable..." style="font-size: 0.8rem; resize: vertical;"></textarea>
+            </div>
+
+            <button class="btn btn-primary btn-sm" id="submitWebReviewBtn" onclick="submitLiveWebsiteReview()" style="width: 100%; background: #059669; border-color: #047857; font-weight: 600;">
+              🚀 Publish Review to Landing Page
+            </button>
+
+            <!-- Published Customer Website Reviews Preview -->
+            <div id="customerPublishedWebReviews" style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px dashed var(--slate-200); font-size: 0.75rem;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 4: Digital Bills & Receipts -->
+        <div class="dashboard-panel" id="billsPanel">
+          <div class="panel-title">
+            <span>🧾 Digital Receipts & History</span>
+          </div>
+          <div class="orders-list" id="billsList">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Modal 1: Booking & Add-on Supplies Modal -->
+    <div class="modal-overlay" id="bookingModalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 2000; align-items: center; justify-content: center; padding: 1rem;">
+      <div class="modal" style="background: var(--white); border-radius: var(--radius-lg); max-width: 550px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.5rem; box-shadow: var(--shadow-xl);">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--slate-200); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+          <h3 id="modalServiceTitle" style="font-size: 1.15rem;">Book Service & Select Decor</h3>
+          <button class="modal-close" onclick="closeBookingModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--slate-500);">&times;</button>
+        </div>
+        <form id="bookingForm" onsubmit="handleConfirmBooking(event)">
+          <div class="modal-body">
+            <input type="hidden" id="bookingServiceId" />
+            <input type="hidden" id="bookingServiceCategory" />
+
+            <div id="bookingServiceSummary" class="alert alert-info" style="margin-bottom: 1.25rem;">
+              <!-- Base price description -->
+            </div>
+
+            <!-- Optional Extra Supplies & Decor Section -->
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">🛍️ Add-on Decor & Supply Inventory (Optional)</label>
+              <p style="font-size: 0.75rem; color: var(--slate-500); margin-bottom: 0.5rem;">Select physical supplies to include with your job or delivery:</p>
+              <div id="modalAddOnSuppliesList">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+
+            <!-- Bangladeshi Delivery Home Address Form -->
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1.25rem;">
+              <label style="font-weight: 700; color: #166534; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                📍 Bangladeshi Delivery Home Address
+              </label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <div>
+                  <label for="addressDivision" style="font-size: 0.75rem; color: #14532d; font-weight: 600;">Division</label>
+                  <select id="addressDivision" class="form-control" style="font-size: 0.85rem; padding: 0.4rem;" required>
+                    <option value="Dhaka">Dhaka Division</option>
+                    <option value="Chattogram">Chattogram Division</option>
+                    <option value="Sylhet">Sylhet Division</option>
+                    <option value="Rajshahi">Rajshahi Division</option>
+                    <option value="Khulna">Khulna Division</option>
+                    <option value="Barishal">Barishal Division</option>
+                    <option value="Rangpur">Rangpur Division</option>
+                    <option value="Mymensingh">Mymensingh Division</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="addressArea" style="font-size: 0.75rem; color: #14532d; font-weight: 600;">District / Area / Thana</label>
+                  <input type="text" id="addressArea" class="form-control" style="font-size: 0.85rem; padding: 0.4rem;" placeholder="e.g. Gulshan, Dhanmondi, Agrabad, Uttara" value="" required />
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0.5rem;">
+                <label for="addressDetails" style="font-size: 0.75rem; color: #14532d; font-weight: 600;">Street, Road, House & Flat / Apartment No.</label>
+                <input type="text" id="addressDetails" class="form-control" style="font-size: 0.85rem; padding: 0.4rem;" placeholder="e.g. House #14, Road #11, Block D, Apt 4B" value="" required />
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <div>
+                  <label for="customerPhone" style="font-size: 0.75rem; color: #14532d; font-weight: 600;">Recipient Mobile No.</label>
+                  <input type="tel" id="customerPhone" class="form-control" style="font-size: 0.85rem; padding: 0.4rem;" placeholder="e.g. +880 1712-345678" value="" required />
+                </div>
+                <div>
+                  <label for="addressLandmark" style="font-size: 0.75rem; color: #14532d; font-weight: 600;">Nearby Landmark (Optional)</label>
+                  <input type="text" id="addressLandmark" class="form-control" style="font-size: 0.85rem; padding: 0.4rem;" placeholder="e.g. Near Central Mosque / Opposite Market" value="" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="bookingDate">Preferred Service / Delivery Date</label>
+              <input type="date" id="bookingDate" class="form-control" required />
+            </div>
+
+            <div class="form-group">
+              <label for="bookingTime">Preferred Time Slot</label>
+              <select id="bookingTime" class="form-control" required>
+                <option value="09:00">09:00 AM (Morning)</option>
+                <option value="11:00">11:00 AM (Morning)</option>
+                <option value="13:00">01:00 PM (Afternoon)</option>
+                <option value="15:00">03:00 PM (Afternoon)</option>
+                <option value="17:00">05:00 PM (Evening)</option>
+              </select>
+            </div>
+
+            <!-- Billing Breakdown Calculation Summary -->
+            <div style="background-color: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 0.85rem; margin-top: 1rem;">
+              <div class="receipt-summary-line">
+                <span>Base Service Rate:</span>
+                <strong id="calcBasePrice">TK0.00</strong>
+              </div>
+              <div class="receipt-summary-line">
+                <span>Add-on Decor Supplies:</span>
+                <strong id="calcSuppliesPrice">TK0.00</strong>
+              </div>
+              <div class="receipt-summary-line">
+                <span>Estimated Local Tax (8%):</span>
+                <strong id="calcTaxPrice">TK0.00</strong>
+              </div>
+              <div class="receipt-summary-line">
+                <span>Marketplace Platform Fee:</span>
+                <strong>TK5.00</strong>
+              </div>
+              <hr style="border: 0; border-top: 1px solid var(--slate-200); margin: 0.5rem 0;" />
+              <div class="receipt-summary-line" style="font-size: 1rem; color: var(--emerald-700);">
+                <strong>Grand Total:</strong>
+                <strong id="calcGrandTotal">TK0.00</strong>
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer" style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="closeBookingModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm" id="confirmBookingBtn">Confirm & Book Order</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal 2: Printable Digital Receipt Modal -->
+    <div class="modal-overlay" id="receiptModalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 2000; align-items: center; justify-content: center; padding: 1rem;">
+      <div class="modal" style="background: var(--white); border-radius: var(--radius-lg); max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.5rem; box-shadow: var(--shadow-xl);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3>Digital Tax Receipt</h3>
+          <button onclick="closeReceiptModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+        <div id="receiptModalContainer" class="printable-receipt">
+          <!-- Rendered dynamically -->
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+          <button class="btn btn-secondary btn-sm" onclick="closeReceiptModal()">Close</button>
+          <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Print Receipt</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="margin-top: 3rem; padding: 1.5rem 2rem; background: var(--slate-900); color: var(--slate-400); font-size: 0.85rem; border-top: 1px solid var(--slate-800);">
+      <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <strong style="color: var(--white);">LocalHub Marketplace</strong> &copy; 2026. All rights reserved.
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button class="theme-toggle-btn" onclick="window.toggleTheme()">🌙 Switch Theme</button>
+          <a href="./index.html" style="color: var(--emerald-400);">Home</a>
+          <a href="./customer.html" style="color: var(--slate-300);">Customer Portal</a>
+          <a href="./provider.html" style="color: var(--slate-300);">Provider Hub</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Core Script Imports -->
+    <script type="module" src="./app.js"></script>
+    <script>
+      let currentCategoryFilter = "all";
+      let currentSortOption = "default";
+      let allCatalogServices = [];
+      let allCatalogSupplies = [];
+      let activeCustomerOrders = [];
+      let selectedStarRating = 5;
+      let activeBookingService = null;
+      let selectedSuppliesMap = {}; // supplyId -> quantity
+      let selectedWebStarRating = 5;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Verify Auth User
+        const user = window.LocalHubStore.getCurrentUser();
+        if (!user) {
+          window.location.href = "./auth.html?tab=login";
+          return;
+        }
+
+        document.getElementById("customerWelcomeTitle").innerText = `Hello, ${user.name || user.email}`;
+
+        // Read URL query params if redirected from home
+        const params = new URLSearchParams(window.location.search);
+        const catParam = params.get("category");
+        const searchParam = params.get("search");
+
+        if (catParam) {
+          setCatalogCategory(catParam);
+        }
+        if (searchParam && document.getElementById("catalogSearch")) {
+          document.getElementById("catalogSearch").value = searchParam;
+        }
+
+        // Attach recent searches dropdown
+        if (window.attachRecentSearchesDropdown) {
+          window.attachRecentSearchesDropdown("catalogSearch");
+        }
+
+        // Fetch Catalog & Supplies
+        await loadCatalogData();
+
+        // Render customer published website reviews
+        renderCustomerPublishedWebReviews();
+        if (window.LocalHubStore.listenToWebsiteReviews) {
+          window.LocalHubStore.listenToWebsiteReviews(() => {
+            renderCustomerPublishedWebReviews();
+          });
+        }
+
+        // Subscribe to real-time Firestore order updates
+        window.LocalHubStore.listenToOrders(user, (orders) => {
+          // Filter orders for current customer
+          activeCustomerOrders = orders.filter(o => o.customerEmail === user.email || o.customerUid === user.uid || o.customerId === user.uid);
+          renderOrderTracker();
+          renderBillsHistory();
+        });
+      });
+
+      async function loadCatalogData() {
+        allCatalogServices = await window.LocalHubStore.getServices();
+        allCatalogSupplies = await window.LocalHubStore.getSupplyItems();
+        renderCatalogGrid();
+      }
+
+      window.setCatalogCategory = function(cat) {
+        currentCategoryFilter = cat;
+        document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+        const targetBtn = document.getElementById(`filter-${cat}`);
+        if (targetBtn) targetBtn.classList.add("active");
+        renderCatalogGrid();
+      };
+
+      window.setCatalogSort = function(sortVal) {
+        currentSortOption = sortVal;
+        renderCatalogGrid();
+      };
+
+      window.filterCatalog = function() {
+        renderCatalogGrid();
+      };
+
+      function renderCatalogGrid() {
+        const grid = document.getElementById("servicesGrid");
+        const searchQuery = (document.getElementById("catalogSearch")?.value || "").toLowerCase();
+
+        let itemsToDisplay = [];
+
+        if (currentCategoryFilter === "decor-supplies") {
+          itemsToDisplay = allCatalogSupplies.map(s => ({ ...s, isSupply: true }));
+        } else if (currentCategoryFilter === "all") {
+          itemsToDisplay = [
+            ...allCatalogServices.map(s => ({ ...s, isSupply: false })),
+            ...allCatalogSupplies.map(s => ({ ...s, isSupply: true }))
+          ];
+        } else {
+          itemsToDisplay = allCatalogServices
+            .filter(s => s.category === currentCategoryFilter)
+            .map(s => ({ ...s, isSupply: false }));
+        }
+
+        if (searchQuery) {
+          itemsToDisplay = itemsToDisplay.filter(item => 
+            item.title.toLowerCase().includes(searchQuery) || 
+            item.description.toLowerCase().includes(searchQuery)
+          );
+        }
+
+        // Apply Sorting
+        if (currentSortOption === "price-asc") {
+          itemsToDisplay.sort((a, b) => a.price - b.price);
+        } else if (currentSortOption === "price-desc") {
+          itemsToDisplay.sort((a, b) => b.price - a.price);
+        } else if (currentSortOption === "rating-desc") {
+          itemsToDisplay.sort((a, b) => (b.rating || 4.9) - (a.rating || 4.9));
+        }
+
+        if (itemsToDisplay.length === 0) {
+          grid.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1"><p>No services or supplies match your query.</p></div>`;
+          return;
+        }
+
+        grid.innerHTML = itemsToDisplay.map(item => `
+          <div class="category-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; border: 1px solid var(--slate-200); border-radius: var(--radius-md); background: var(--white);">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                <span style="font-size: 2rem;">${item.iconClass || '📦'}</span>
+                <span class="category-badge" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background: ${item.isSupply ? 'var(--emerald-100)' : 'var(--slate-100)'}; color: ${item.isSupply ? 'var(--emerald-800)' : 'var(--slate-800)'}; border-radius: var(--radius-sm); font-weight: 600;">
+                  ${item.isSupply ? 'Supply Inventory' : (item.categoryLabel || 'Service')}
+                </span>
+              </div>
+              <h3 style="font-size: 1rem; margin-bottom: 0.35rem;">${item.title}</h3>
+              <p style="font-size: 0.8rem; color: var(--slate-500); margin-bottom: 0.75rem;">${item.description}</p>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--slate-100); padding-top: 0.75rem; margin-top: 0.5rem;">
+              <div>
+                <span style="font-size: 0.75rem; color: var(--slate-400);">Price</span><br>
+                <strong style="font-size: 1.1rem; color: var(--emerald-600);">TK${item.price}</strong> <small style="font-size: 0.7rem; color: var(--slate-500);">/${item.unit || 'unit'}</small>
+              </div>
+              <button class="btn btn-sm btn-primary" onclick="openBookingModal('${item.id}', ${item.isSupply})">
+                ${item.isSupply ? 'Order Supply' : 'Book Service'}
+              </button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      window.openBookingModal = function(itemId, isSupply) {
+        selectedSuppliesMap = {};
+        const user = window.LocalHubStore.getCurrentUser();
+        
+        let item = null;
+        if (isSupply) {
+          item = allCatalogSupplies.find(s => s.id === itemId);
+        } else {
+          item = allCatalogServices.find(s => s.id === itemId);
+        }
+
+        if (!item) return;
+        activeBookingService = { ...item, isSupply };
+
+        document.getElementById("modalServiceTitle").innerText = isSupply 
+          ? `Order Decor Supply: ${item.title}` 
+          : `Book Service: ${item.title}`;
+
+        document.getElementById("bookingServiceId").value = item.id;
+        document.getElementById("bookingServiceCategory").value = item.category;
+
+        document.getElementById("bookingServiceSummary").innerHTML = `
+          <strong>${item.title}</strong> — TK${item.price} per ${item.unit || 'job'}<br>
+          <span style="font-size: 0.8rem">${item.description}</span>
+        `;
+
+        // Render extra decor supplies options
+        const suppliesContainer = document.getElementById("modalAddOnSuppliesList");
+        suppliesContainer.innerHTML = allCatalogSupplies.map(sup => `
+          <div class="add-on-item-row">
+            <div>
+              <strong style="font-size: 0.85rem">${sup.iconClass || '💡'} ${sup.title}</strong><br>
+              <span style="font-size: 0.75rem; color: var(--slate-500);">TK${sup.price} / pack</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="checkbox" id="chk_sup_${sup.id}" onchange="toggleAddOnSupply('${sup.id}', ${sup.price}, this.checked)" style="width: 18px; height: 18px; cursor: pointer;" />
+              <input type="number" id="qty_sup_${sup.id}" min="1" max="10" value="1" onchange="updateAddOnQty('${sup.id}', ${sup.price}, this.value)" style="width: 50px; padding: 0.2rem; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--slate-300);" />
+            </div>
+          </div>
+        `).join("");
+
+        // Pre-set default date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById("bookingDate").value = tomorrow.toISOString().split("T")[0];
+
+        updateBookingTotals();
+        document.getElementById("bookingModalOverlay").style.display = "flex";
+      };
+
+      window.closeBookingModal = function() {
+        document.getElementById("bookingModalOverlay").style.display = "none";
+      };
+
+      window.toggleAddOnSupply = function(id, price, isChecked) {
+        if (isChecked) {
+          const qty = parseInt(document.getElementById(`qty_sup_${id}`).value) || 1;
+          selectedSuppliesMap[id] = qty;
+        } else {
+          delete selectedSuppliesMap[id];
+        }
+        updateBookingTotals();
+      };
+
+      window.updateAddOnQty = function(id, price, val) {
+        const chk = document.getElementById(`chk_sup_${id}`);
+        if (chk && chk.checked) {
+          selectedSuppliesMap[id] = parseInt(val) || 1;
+          updateBookingTotals();
+        }
+      };
+
+      function updateBookingTotals() {
+        if (!activeBookingService) return;
+
+        const basePrice = activeBookingService.price || 0;
+        let suppliesPrice = 0;
+
+        for (const [supId, qty] of Object.entries(selectedSuppliesMap)) {
+          const item = allCatalogSupplies.find(s => s.id === supId);
+          if (item) {
+            suppliesPrice += item.price * qty;
+          }
+        }
+
+        const subtotal = basePrice + suppliesPrice;
+        const tax = subtotal * 0.08;
+        const platformFee = 5.00;
+        const grandTotal = subtotal + tax + platformFee;
+
+        document.getElementById("calcBasePrice").innerText = `TK${basePrice.toFixed(2)}`;
+        document.getElementById("calcSuppliesPrice").innerText = `TK${suppliesPrice.toFixed(2)}`;
+        document.getElementById("calcTaxPrice").innerText = `TK${tax.toFixed(2)}`;
+        document.getElementById("calcGrandTotal").innerText = `TK${grandTotal.toFixed(2)}`;
+      }
+
+      window.handleConfirmBooking = async function(e) {
+        e.preventDefault();
+        const user = window.LocalHubStore.getCurrentUser();
+        if (!user || !activeBookingService) return;
+
+        const date = document.getElementById("bookingDate").value;
+        const time = document.getElementById("bookingTime").value;
+
+        // Bangladeshi Home Address data
+        const addressDivision = document.getElementById("addressDivision")?.value || "Dhaka";
+        const addressArea = document.getElementById("addressArea")?.value?.trim() || "Gulshan";
+        const addressDetails = document.getElementById("addressDetails")?.value?.trim() || "House #1, Road #1";
+        const customerPhone = document.getElementById("customerPhone")?.value?.trim() || "+880 1700-000000";
+        const addressLandmark = document.getElementById("addressLandmark")?.value?.trim() || "";
+        const fullDeliveryAddress = `${addressDetails}, ${addressArea}, ${addressDivision}, Bangladesh`;
+
+        // Build selected add-on items payload
+        const suppliesPayload = [];
+        let suppliesTotal = 0;
+        for (const [supId, qty] of Object.entries(selectedSuppliesMap)) {
+          const item = allCatalogSupplies.find(s => s.id === supId);
+          if (item) {
+            const lineTotal = item.price * qty;
+            suppliesTotal += lineTotal;
+            suppliesPayload.push({
+              id: item.id,
+              title: item.title,
+              price: item.price,
+              quantity: qty,
+              lineTotal
+            });
+          }
+        }
+
+        const subtotal = activeBookingService.price + suppliesTotal;
+        const tax = subtotal * 0.08;
+        const platformFee = 5.00;
+        const totalPrice = subtotal + tax + platformFee;
+
+        const confirmBtn = document.getElementById("confirmBookingBtn");
+        confirmBtn.disabled = true;
+        confirmBtn.innerText = "Submitting Order...";
+
+        const orderPayload = {
+          orderNumber: "LH-" + Math.floor(1000 + Math.random() * 9000),
+          customerId: user.uid,
+          customerName: user.name || user.email,
+          customerEmail: user.email,
+          customerPhone: customerPhone,
+          deliveryAddress: fullDeliveryAddress,
+          addressDivision: addressDivision,
+          addressArea: addressArea,
+          addressDetails: addressDetails,
+          addressLandmark: addressLandmark,
+          providerId: activeBookingService.providerId || "unassigned",
+          serviceId: activeBookingService.id,
+          serviceTitle: activeBookingService.title,
+          serviceCategory: activeBookingService.category,
+          price: activeBookingService.price,
+          supplies: suppliesPayload,
+          suppliesTotal,
+          subtotal,
+          tax,
+          platformFee,
+          totalPrice,
+          date,
+          time,
+          status: "pending"
+        };
+
+        try {
+          await window.LocalHubStore.createBooking(orderPayload);
+          window.showToastNotification(`Order #${orderPayload.orderNumber} confirmed & sent with delivery address!`);
+          closeBookingModal();
+        } catch (err) {
+          window.showToastNotification("Order submission error: " + err.message, "info");
+        } finally {
+          confirmBtn.disabled = false;
+          confirmBtn.innerText = "Confirm & Book Order";
+        }
+      };
+
+      // Set to track dismissed delivered orders so customer tracking doesn't stay stuck
+      window.dismissedDeliveredOrderIds = window.dismissedDeliveredOrderIds || new Set();
+
+      window.dismissDeliveredTracker = function(orderId) {
+        window.dismissedDeliveredOrderIds.add(orderId);
+        renderOrderTracker();
+      };
+
+      /**
+       * Render Real-Time Order Timeline Tracker & Delivery Handover Status
+       */
+      function renderOrderTracker() {
+        const container = document.getElementById("trackingContent");
+        const activeBadge = document.getElementById("activeOrderBadge");
+        const reviewPanel = document.getElementById("reviewPanel");
+
+        // Active order = status not paid/canceled AND not already dismissed
+        const activeOrder = activeCustomerOrders.find(o => 
+          o.status !== "paid" && 
+          o.status !== "canceled" && 
+          !window.dismissedDeliveredOrderIds.has(o.id) &&
+          !window.dismissedDeliveredOrderIds.has(o.orderNumber)
+        );
+
+        if (!activeOrder) {
+          activeBadge.style.display = "none";
+          if (reviewPanel) reviewPanel.style.display = "none";
+          container.innerHTML = `
+            <div class="empty-state" style="padding: 1.5rem 1rem; text-align: center;">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">✨</div>
+              <p style="font-weight: 600; color: var(--slate-700); margin-bottom: 0.25rem;">No active deliveries in progress.</p>
+              <span style="font-size: 0.8rem; color: var(--slate-500);">System is standing by. Book a service or order supplies to initiate the next delivery!</span>
+            </div>
+          `;
+          return;
+        }
+
+        activeBadge.style.display = "inline-block";
+
+        // Determine step progression
+        const stages = ["pending", "accepted", "dispatched", "executing", "delivered_pending_confirmation", "delivered"];
+        const currentIndex = stages.indexOf(activeOrder.status);
+        const fillPercent = activeOrder.status === "delivered" 
+          ? 100 
+          : Math.min(100, Math.max(10, (Math.max(0, currentIndex) / (stages.length - 1)) * 100));
+
+        // Show review panel if delivered
+        if (activeOrder.status === "delivered" && !activeOrder.rating) {
+          if (reviewPanel) {
+            reviewPanel.style.display = "block";
+            reviewPanel.dataset.orderId = activeOrder.id;
+          }
+        } else {
+          if (reviewPanel) reviewPanel.style.display = "none";
+        }
+
+        const suppliesListText = activeOrder.supplies && activeOrder.supplies.length > 0
+          ? activeOrder.supplies.map(s => `${s.title} (x${s.quantity})`).join(", ")
+          : "None";
+
+        const isPendingManualDeliveryTap = activeOrder.status === "delivered_pending_confirmation";
+        const isDispatchedOrTransit = activeOrder.status === "dispatched" || activeOrder.status === "executing";
+        const isDelivered = activeOrder.status === "delivered";
+
+        // Auto-hide countdown logic when delivered
+        if (isDelivered && !activeOrder._autoHideScheduled) {
+          activeOrder._autoHideScheduled = true;
+          let remainingSeconds = 7;
+          const countdownInterval = setInterval(() => {
+            remainingSeconds--;
+            const countEl = document.getElementById("autoHideCountdownSpan");
+            if (countEl) countEl.innerText = `${remainingSeconds}s`;
+            if (remainingSeconds <= 0) {
+              clearInterval(countdownInterval);
+              window.dismissedDeliveredOrderIds.add(activeOrder.id);
+              window.dismissedDeliveredOrderIds.add(activeOrder.orderNumber);
+              renderOrderTracker();
+            }
+          }, 1000);
+        }
+
+        container.innerHTML = `
+          <div style="border: 1px solid ${isDelivered ? '#86efac' : 'var(--emerald-200)'}; background-color: ${isDelivered ? '#f0fdf4' : 'var(--emerald-50)'}; padding: 0.85rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <div>
+                <strong style="color: var(--emerald-800); font-size: 1rem;">${activeOrder.serviceTitle}</strong><br>
+                <span style="font-size: 0.75rem; color: var(--emerald-600);">Order #${activeOrder.orderNumber || activeOrder.id} • ${activeOrder.date} at ${activeOrder.time}</span>
+              </div>
+              <strong style="color: var(--emerald-800); font-size: 1.1rem;">TK${parseFloat(activeOrder.totalPrice || activeOrder.price || 0).toFixed(2)}</strong>
+            </div>
+
+            <!-- Customer Bangladeshi Delivery Address -->
+            <div style="background: white; border: 1px solid var(--slate-200); border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; font-size: 0.75rem; color: var(--slate-700);">
+              <div style="font-weight: 700; color: #15803d; margin-bottom: 0.15rem;">📍 Delivery Destination:</div>
+              <div>${activeOrder.deliveryAddress || (activeOrder.addressDetails ? `${activeOrder.addressDetails}, ${activeOrder.addressArea || ''}, ${activeOrder.addressDivision || ''}` : 'Dhaka, Bangladesh')}</div>
+              ${activeOrder.customerPhone ? `<div style="color: var(--slate-500); margin-top: 0.15rem;">📞 Contact: <strong>${activeOrder.customerPhone}</strong></div>` : ''}
+            </div>
+
+            <div style="font-size: 0.75rem; color: var(--slate-600); margin-bottom: 0.5rem;">
+              <strong>Included Decor Supplies:</strong> ${suppliesListText}
+            </div>
+
+            <!-- Delivered Celebration & Auto-Hide Banner -->
+            ${isDelivered ? `
+              <div style="background: #dcfce7; border: 1.5px solid #22c55e; border-radius: 8px; padding: 0.75rem; margin: 0.75rem 0; color: #14532d;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                  <span style="font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; gap: 0.35rem;">
+                    🎉 Parcel Delivered Successfully!
+                  </span>
+                  <span style="font-size: 0.7rem; background: #22c55e; color: white; padding: 0.15rem 0.45rem; border-radius: 9999px; font-weight: 600;">
+                    Auto-hiding in <span id="autoHideCountdownSpan">7s</span>
+                  </span>
+                </div>
+                <p style="font-size: 0.75rem; color: #166534; margin: 0.25rem 0 0.5rem;">
+                  The deliveryman verified and confirmed the parcel handover. Receipt stored below.
+                </p>
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                  <button onclick="dismissDeliveredTracker('${activeOrder.id}')" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; background: white; border: 1px solid #86efac; color: #15803d; font-weight: 600;">
+                    ✓ Done / Clear Tracker
+                  </button>
+                  <button onclick="viewDigitalReceipt('${activeOrder.id}')" class="btn btn-sm btn-primary" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; background: #16a34a;">
+                    🧾 View Receipt
+                  </button>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Delivery Workflow Status Alert Banner -->
+            ${isPendingManualDeliveryTap ? `
+              <div class="status-pending-confirmation">
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; margin-bottom: 0.25rem;">
+                  <span>🚚</span> Order Arrived at Destination!
+                </div>
+                <div style="font-size: 0.8rem; line-height: 1.4;">
+                  Awaiting <strong>Manual Deliveryman Confirmation</strong>. The deliveryman is handing over the parcel and confirming in real-time.
+                </div>
+              </div>
+            ` : ''}
+
+            ${isDispatchedOrTransit ? `
+              <div style="background: #e0f2fe; border: 1px solid #38bdf8; border-radius: 6px; padding: 0.65rem; margin: 0.75rem 0; font-size: 0.8rem; color: #0369a1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <strong>Driver in Transit</strong> with your parcel
+                </div>
+                <button onclick="handleCustomerMarkReceived('${activeOrder.id}')" class="btn btn-sm btn-primary" style="background: #0284c7; color: white; padding: 0.3rem 0.6rem; font-size: 0.75rem;">
+                  📍 Mark Received at Doorstep
+                </button>
+              </div>
+            ` : ''}
+
+            <!-- Timeline Visual Step Indicator -->
+            <div class="timeline-container">
+              <div class="timeline-progress-bar">
+                <div class="timeline-progress-fill" style="width: ${fillPercent}%;"></div>
+              </div>
+              <div class="timeline-steps">
+                <div class="timeline-step ${currentIndex >= 0 ? 'active' : ''}">
+                  <div class="timeline-step-dot"></div>
+                  Pending
+                </div>
+                <div class="timeline-step ${currentIndex >= 1 ? 'active' : ''}">
+                  <div class="timeline-step-dot"></div>
+                  Accepted
+                </div>
+                <div class="timeline-step ${currentIndex >= 2 ? 'active' : ''}">
+                  <div class="timeline-step-dot"></div>
+                  Dispatched
+                </div>
+                <div class="timeline-step ${currentIndex >= 3 ? 'active' : ''}">
+                  <div class="timeline-step-dot"></div>
+                  In-Transit
+                </div>
+                <div class="timeline-step ${currentIndex >= 4 ? 'active' : ''}">
+                  <div class="timeline-step-dot"></div>
+                  Handover
+                </div>
+                <div class="timeline-step ${currentIndex >= 5 || isDelivered ? 'active' : ''}">
+                  <div class="timeline-step-dot" style="${isDelivered ? 'background: #22c55e;' : ''}"></div>
+                  Delivered
+                </div>
+              </div>
+            </div>
+
+            <div style="text-align: center; font-size: 0.8rem; color: var(--slate-700); margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+              <span>Status: <strong style="text-transform: uppercase; color: ${isDelivered ? '#16a34a' : 'var(--emerald-700)'};">${activeOrder.status.replace(/_/g, ' ')}</strong></span>
+              ${activeOrder.status === 'delivered' ? `
+                <button onclick="viewDigitalReceipt('${activeOrder.id}')" class="btn btn-sm btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">
+                  🧾 View Receipt
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      window.handleCustomerMarkReceived = async function(orderId) {
+        try {
+          await window.LocalHubStore.markCustomerReceived(orderId);
+          window.showToastNotification("✔ Delivery marked as received! Awaiting final manual verification tap from the deliveryman.");
+        } catch (err) {
+          window.showToastNotification("Update error: " + err.message, "info");
+        }
+      };
+
+      window.setStarRating = function(rating) {
+        selectedStarRating = rating;
+        const stars = document.querySelectorAll("#ratingStarsSelector .star-input, #ratingStarsSelector .rating-star-btn");
+        stars.forEach((star, idx) => {
+          if (idx < rating) {
+            star.style.color = "#f59e0b";
+            star.classList.add("active");
+          } else {
+            star.style.color = "var(--slate-300)";
+            star.classList.remove("active");
+          }
+        });
+      };
+
+      window.toggleReviewTag = function(el) {
+        el.classList.toggle("selected");
+      };
+
+      window.submitActiveReview = async function() {
+        const reviewPanel = document.getElementById("reviewPanel");
+        const orderId = reviewPanel.dataset.orderId;
+        const text = document.getElementById("reviewComment").value.trim();
+        const user = window.LocalHubStore.getCurrentUser();
+
+        if (!orderId || !user) return;
+
+        const selectedTags = Array.from(document.querySelectorAll(".rating-tag-chip.selected")).map(c => c.innerText);
+        const fullReviewText = selectedTags.length > 0 
+          ? `[${selectedTags.join(", ")}] ${text}`
+          : text;
+
+        const activeOrder = activeCustomerOrders.find(o => o.id === orderId);
+        const providerId = activeOrder ? (activeOrder.providerId || "unassigned") : "unassigned";
+
+        const btn = document.getElementById("submitReviewBtn");
+        btn.disabled = true;
+        btn.innerText = "Submitting Review...";
+
+        try {
+          const res = await window.LocalHubStore.submitReview(orderId, user.uid, providerId, selectedStarRating, fullReviewText);
+          if (res.success) {
+            window.showToastNotification("✨ Thank you! Your 5-star verified review has been published to LocalHub.");
+            reviewPanel.style.display = "none";
+          } else {
+            window.showToastNotification("Error submitting review: " + (res.message || "Failed"), "info");
+          }
+        } catch (err) {
+          window.showToastNotification("Review error: " + err.message, "info");
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "Submit Feedback";
+        }
+      };
+
+      /**
+       * Website & Platform Live Rating & Review System
+       */
+      window.setWebStarRating = function(rating) {
+        selectedWebStarRating = rating;
+        const stars = document.querySelectorAll("#webRatingStarsSelector .web-star-btn");
+        stars.forEach((star, idx) => {
+          if (idx < rating) {
+            star.style.color = "#f59e0b";
+            star.classList.add("active");
+          } else {
+            star.style.color = "var(--slate-300)";
+            star.classList.remove("active");
+          }
+        });
+      };
+
+      window.updateWebCharCount = function(textarea) {
+        const count = textarea.value.length;
+        const counterEl = document.getElementById("webCharCount");
+        if (counterEl) {
+          counterEl.innerText = `${count} / 280`;
+          counterEl.style.color = count > 280 ? "var(--red-500)" : "var(--slate-400)";
+        }
+      };
+
+      window.submitLiveWebsiteReview = async function() {
+        const user = window.LocalHubStore.getCurrentUser();
+        if (!user) {
+          window.showToastNotification("Please sign in to submit a website review.", "info");
+          return;
+        }
+
+        const text = (document.getElementById("webReviewComment")?.value || "").trim();
+        const neighborhood = document.getElementById("webReviewNeighborhood")?.value || "Greenwood District";
+
+        if (!text) {
+          window.showToastNotification("Please type your website feedback before submitting.", "info");
+          return;
+        }
+
+        const submitBtn = document.getElementById("submitWebReviewBtn");
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Publishing to Landing Page...";
+
+        try {
+          const res = await window.LocalHubStore.submitWebsiteReview({
+            rating: selectedWebStarRating,
+            text,
+            authorName: user.name || (user.email ? user.email.split('@')[0] : "Verified Resident"),
+            location: neighborhood,
+            customerId: user.uid,
+            tag: "Verified Customer"
+          });
+
+          if (res.success) {
+            window.showToastNotification("🚀 Success! Your live website review is now visible on the LocalHub landing page!");
+            const commentInput = document.getElementById("webReviewComment");
+            if (commentInput) {
+              commentInput.value = "";
+              updateWebCharCount(commentInput);
+            }
+            renderCustomerPublishedWebReviews();
+          } else {
+            window.showToastNotification("Error publishing review.", "info");
+          }
+        } catch (err) {
+          window.showToastNotification("Publish error: " + err.message, "info");
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerText = "🚀 Publish Review to Landing Page";
+        }
+      };
+
+      function renderCustomerPublishedWebReviews() {
+        const container = document.getElementById("customerPublishedWebReviews");
+        if (!container || !window.LocalHubStore.getWebsiteReviews) return;
+
+        const allWebReviews = window.LocalHubStore.getWebsiteReviews();
+        const user = window.LocalHubStore.getCurrentUser();
+        
+        const customerReviews = user ? allWebReviews.filter(r => r.customerId === user.uid) : [];
+
+        if (customerReviews.length === 0) {
+          container.innerHTML = `
+            <div style="color: var(--slate-400); font-style: italic;">
+              You haven't submitted a website testimonial yet. Type above to share your thoughts on our homepage!
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <strong style="color: var(--slate-700); display: block; margin-bottom: 0.35rem;">Your Published Website Testimonials (${customerReviews.length}):</strong>
+          ${customerReviews.slice(0, 3).map(r => `
+            <div style="background: var(--white); border: 1px solid var(--slate-200); border-radius: var(--radius-sm); padding: 0.5rem; margin-bottom: 0.35rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: #f59e0b; font-size: 0.8rem;">${'★'.repeat(r.rating)}</span>
+                <span class="delivery-verified-badge" style="font-size: 0.6rem; padding: 0.1rem 0.35rem;">Live on Home Page</span>
+              </div>
+              <p style="margin: 0.25rem 0 0 0; color: var(--slate-600); font-size: 0.75rem;">"${r.text}"</p>
+              <span style="font-size: 0.65rem; color: var(--slate-400);">${r.location}</span>
+            </div>
+          `).join("")}
+        `;
+      }
+
+      /**
+       * Render Past Bills & Digital Receipts
+       */
+      function renderBillsHistory() {
+        const container = document.getElementById("billsList");
+
+        if (activeCustomerOrders.length === 0) {
+          container.innerHTML = `<div class="empty-state"><p>No previous orders recorded.</p></div>`;
+          return;
+        }
+
+        container.innerHTML = activeCustomerOrders.map(order => `
+          <div style="padding: 0.75rem; border: 1px solid var(--slate-200); border-radius: var(--radius-sm); margin-bottom: 0.5rem; background: var(--white); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="font-size: 0.85rem">${order.serviceTitle}</strong><br>
+              <span style="font-size: 0.75rem; color: var(--slate-500);">${order.date} • Status: ${order.status.toUpperCase()}</span>
+            </div>
+            <div style="text-align: right;">
+              <strong style="font-size: 0.9rem; color: var(--emerald-700); display: block;">TK${order.totalPrice.toFixed(2)}</strong>
+              <button class="btn btn-sm btn-outline" style="font-size: 0.7rem; padding: 0.15rem 0.4rem; margin-top: 0.2rem;" onclick="viewDigitalReceipt('${order.id}')">
+                🧾 Receipt
+              </button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      window.viewDigitalReceipt = function(orderId) {
+        const order = activeCustomerOrders.find(o => o.id === orderId);
+        if (!order) return;
+
+        const receiptContainer = document.getElementById("receiptModalContainer");
+
+        const suppliesRowsHtml = order.supplies && order.supplies.length > 0
+          ? order.supplies.map(s => `
+              <tr>
+                <td>${s.title} (Supply)</td>
+                <td>${s.quantity}</td>
+                <td>TK${s.price.toFixed(2)}</td>
+                <td>TK${s.lineTotal.toFixed(2)}</td>
+              </tr>
+            `).join("")
+          : `<tr><td colspan="4" style="color: var(--slate-400)">No add-on decor supplies selected</td></tr>`;
+
+        receiptContainer.innerHTML = `
+          <div class="receipt-header">
+            <div>
+              <h2 style="color: var(--slate-900); font-size: 1.25rem;">LocalHub Official Receipt</h2>
+              <span style="font-size: 0.8rem; color: var(--slate-500);">Hyperlocal Home Services & Decor Store</span>
+            </div>
+            <div style="text-align: right;">
+              <strong>Receipt #${order.orderNumber || order.id}</strong><br>
+              <span style="font-size: 0.75rem; color: var(--slate-500);">${order.date}</span>
+            </div>
+          </div>
+
+          <div style="font-size: 0.85rem; margin-bottom: 1rem; color: var(--slate-700);">
+            <strong>Billed To:</strong> ${order.customerName} (${order.customerEmail})<br>
+            <strong>Service Date:</strong> ${order.date} at ${order.time}
+          </div>
+
+          <table class="receipt-table">
+            <thead>
+              <tr>
+                <th>Item / Description</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>${order.serviceTitle}</strong> (${order.serviceCategory})</td>
+                <td>1</td>
+                <td>TK${order.price.toFixed(2)}</td>
+                <td>TK${order.price.toFixed(2)}</td>
+              </tr>
+              ${suppliesRowsHtml}
+            </tbody>
+          </table>
+
+          <div style="border-top: 1px dashed var(--slate-300); padding-top: 0.75rem; margin-top: 0.5rem;">
+            <div class="receipt-summary-line">
+              <span>Base Subtotal:</span>
+              <span>TK${order.subtotal.toFixed(2)}</span>
+            </div>
+            <div class="receipt-summary-line">
+              <span>Local Sales Tax (8%):</span>
+              <span>TK${order.tax.toFixed(2)}</span>
+            </div>
+            <div class="receipt-summary-line">
+              <span>Marketplace Platform Fee:</span>
+              <span>TK${order.platformFee.toFixed(2)}</span>
+            </div>
+            <div class="receipt-summary-line" style="font-size: 1.1rem; font-weight: 700; color: var(--emerald-800); margin-top: 0.25rem;">
+              <span>Total Paid:</span>
+              <span>TK${order.totalPrice.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+            <div class="paid-stamp">PAID IN FULL</div>
+            <div style="font-size: 0.75rem; color: var(--slate-400);">Verified via Firebase Cloud Firestore</div>
+          </div>
+        `;
+
+        document.getElementById("receiptModalOverlay").style.display = "flex";
+      };
+
+      window.closeReceiptModal = function() {
+        document.getElementById("receiptModalOverlay").style.display = "none";
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bangladeshi Area Delivery Fleet Tracking — LocalHub</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .zone-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: var(--slate-100);
+        border-radius: var(--radius-md);
+        margin: 1.25rem 0 0.75rem 0;
+        border-left: 4px solid var(--emerald-500);
+      }
+      .rider-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+      }
+      .rider-card {
+        background: var(--white);
+        border: 1px solid var(--slate-200);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .rider-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--emerald-300);
+      }
+      .rider-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+      }
+      .rider-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        background: #f1f5f9;
+        border: 2px solid #e2e8f0;
+      }
+      .rider-status-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.2rem 0.5rem;
+        border-radius: 9999px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      .status-available { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+      .status-on-delivery { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+      .status-at-hub { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+      .status-break { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar" id="mainNavbar">
+      <div class="navbar-container">
+        <a href="./index.html" class="logo" id="logoLink">
+          <div class="logo-icon-svg">
+            <div class="logo-icon-inner">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <span class="logo-text">LocalHub</span>
+        </a>
+        <div class="nav-links" id="navAuthActions">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="dashboard-layout" style="display: block; max-width: 1240px; margin: 0 auto; padding: 2rem 1.5rem;">
+      
+      <!-- Breadcrumb & Back Navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <a href="./provider.html" style="color: var(--emerald-600); text-decoration: none; font-size: 0.9rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
+          ← Back to Provider Operations Hub
+        </a>
+        <div style="display: flex; gap: 0.5rem;">
+          <a href="./delivery.html" class="btn btn-sm btn-outline" style="font-size: 0.75rem;">🚚 Open Delivery Fleet Console</a>
+          <button onclick="simulateLiveRiderActivity()" class="btn btn-sm btn-primary" style="font-size: 0.75rem; background: var(--emerald-600);">
+            🔄 Refresh GPS Telemetry
+          </button>
+        </div>
+      </div>
+
+      <!-- Hero Header & Statistics -->
+      <div style="background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 1.5rem; color: white; box-shadow: var(--shadow-md);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span style="font-size: 1.5rem;">🛵</span>
+              <h1 style="font-size: 1.5rem; font-weight: 800; margin: 0; color: #ffffff;">Bangladeshi Area Delivery Fleet Tracking</h1>
+              <span class="delivery-verified-badge" style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border-color: #22c55e;">20 Active Riders</span>
+            </div>
+            <p style="color: #94a3b8; font-size: 0.85rem; margin: 0; max-width: 680px;">
+              Real-time dispatch telemetry and availability map of 20 verified local delivery runners divided across Dhaka, Chattogram, Sylhet, Rajshahi, and Khulna metropolitan zones.
+            </p>
+          </div>
+
+          <!-- Quick Stats Pills -->
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: var(--radius-md); padding: 0.5rem 0.85rem; text-align: center; min-width: 90px;">
+              <span style="font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; display: block;">Total Fleet</span>
+              <strong id="statTotalRiders" style="color: #38bdf8; font-size: 1.25rem;">20</strong>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: var(--radius-md); padding: 0.5rem 0.85rem; text-align: center; min-width: 90px;">
+              <span style="font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; display: block;">Available</span>
+              <strong id="statAvailableRiders" style="color: #4ade80; font-size: 1.25rem;">12</strong>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: var(--radius-md); padding: 0.5rem 0.85rem; text-align: center; min-width: 90px;">
+              <span style="font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; display: block;">On Delivery</span>
+              <strong id="statOnDeliveryRiders" style="color: #fbbf24; font-size: 1.25rem;">6</strong>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: var(--radius-md); padding: 0.5rem 0.85rem; text-align: center; min-width: 90px;">
+              <span style="font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; display: block;">At Hub / Break</span>
+              <strong id="statRestingRiders" style="color: #cbd5e1; font-size: 1.25rem;">2</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search & Zone Filters Controls -->
+      <div style="background: var(--white); border: 1px solid var(--slate-200); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.75rem;">
+          <!-- Search box -->
+          <div style="position: relative; flex: 1; min-width: 260px;">
+            <input 
+              type="text" 
+              id="riderSearchInput" 
+              class="form-control" 
+              placeholder="🔍 Search deliveryman by name, area (e.g. Gulshan), phone, or ID..." 
+              oninput="handleSearchRiders(this.value)"
+              style="padding-left: 0.75rem; font-size: 0.85rem;"
+            />
+          </div>
+
+          <!-- Status Filter Pills -->
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;" id="statusFilterGroup">
+            <button class="filter-pill-btn active" onclick="filterByStatus('all', this)">All Statuses</button>
+            <button class="filter-pill-btn" onclick="filterByStatus('available', this)">🟢 Available</button>
+            <button class="filter-pill-btn" onclick="filterByStatus('on_delivery', this)">🚚 On Delivery</button>
+            <button class="filter-pill-btn" onclick="filterByStatus('at_hub', this)">🏢 At Hub</button>
+            <button class="filter-pill-btn" onclick="filterByStatus('on_break', this)">☕ On Break</button>
+          </div>
+        </div>
+
+        <!-- Zone Tabs Bar -->
+        <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem; border-top: 1px solid var(--slate-100); padding-top: 0.75rem;" id="zoneFilterGroup">
+          <button class="filter-pill-btn active" onclick="filterByZone('all', this)" style="font-weight: 700;">
+            🗺️ All 5 Bangladesh Divisions (20 Riders)
+          </button>
+          <button class="filter-pill-btn" onclick="filterByZone('Dhaka North (Zone A)', this)">
+            🏙️ Dhaka North (5 Riders)
+          </button>
+          <button class="filter-pill-btn" onclick="filterByZone('Dhaka South (Zone B)', this)">
+            🏢 Dhaka South (5 Riders)
+          </button>
+          <button class="filter-pill-btn" onclick="filterByZone('Chattogram Metro (Zone C)', this)">
+            ⚓ Chattogram Metro (4 Riders)
+          </button>
+          <button class="filter-pill-btn" onclick="filterByZone('Sylhet Division (Zone D)', this)">
+            🌿 Sylhet Division (3 Riders)
+          </button>
+          <button class="filter-pill-btn" onclick="filterByZone('Rajshahi & Khulna (Zone E)', this)">
+            🌾 Rajshahi & Khulna (3 Riders)
+          </button>
+        </div>
+      </div>
+
+      <!-- Area Fleet Roster Container -->
+      <div id="fleetRosterContainer">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="margin-top: 3rem; padding: 1.5rem 2rem; background: var(--slate-900); color: var(--slate-400); font-size: 0.85rem; border-top: 1px solid var(--slate-800);">
+      <div style="max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <strong style="color: var(--white);">LocalHub Logistics & Area Telemetry Network</strong> &copy; 2026.
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button class="theme-toggle-btn" onclick="window.toggleTheme()">🌙 Switch Theme</button>
+          <a href="./provider.html" style="color: var(--emerald-400);">Provider Hub</a>
+          <a href="./delivery.html" style="color: var(--slate-300);">Delivery Portal</a>
+          <a href="./customer.html" style="color: var(--slate-300);">Customer Store</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Core App Module Scripts -->
+    <script type="module" src="./app.js"></script>
+    <script type="module">
+      import { LocalHubStore, showToastNotification } from "./app.js";
+
+      let allRiders = [];
+      let activeZoneFilter = "all";
+      let activeStatusFilter = "all";
+      let searchQuery = "";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadFleetRiders();
+      });
+
+      function loadFleetRiders() {
+        allRiders = LocalHubStore.getDeliveryRiders();
+        updateStats();
+        renderFleetRoster();
+      }
+
+      function updateStats() {
+        const total = allRiders.length;
+        const available = allRiders.filter(r => r.status === "available").length;
+        const onDeliv = allRiders.filter(r => r.status === "on_delivery").length;
+        const resting = allRiders.filter(r => r.status === "at_hub" || r.status === "on_break").length;
+
+        document.getElementById("statTotalRiders").innerText = total;
+        document.getElementById("statAvailableRiders").innerText = available;
+        document.getElementById("statOnDeliveryRiders").innerText = onDeliv;
+        document.getElementById("statRestingRiders").innerText = resting;
+      }
+
+      window.handleSearchRiders = function(query) {
+        searchQuery = (query || "").toLowerCase().trim();
+        renderFleetRoster();
+      };
+
+      window.filterByZone = function(zone, btn) {
+        activeZoneFilter = zone;
+        document.querySelectorAll("#zoneFilterGroup .filter-pill-btn").forEach(b => b.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+        renderFleetRoster();
+      };
+
+      window.filterByStatus = function(status, btn) {
+        activeStatusFilter = status;
+        document.querySelectorAll("#statusFilterGroup .filter-pill-btn").forEach(b => b.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+        renderFleetRoster();
+      };
+
+      window.cycleRiderStatus = function(riderId) {
+        const statuses = ["available", "on_delivery", "at_hub", "on_break"];
+        const rider = allRiders.find(r => r.id === riderId);
+        if (!rider) return;
+
+        const nextIdx = (statuses.indexOf(rider.status) + 1) % statuses.length;
+        const newStatus = statuses[nextIdx];
+
+        LocalHubStore.updateDeliveryRiderStatus(riderId, newStatus);
+        loadFleetRiders();
+        showToastNotification(`Status for ${rider.name} updated to ${newStatus.toUpperCase().replace('_', ' ')}`);
+      };
+
+      window.simulateLiveRiderActivity = function() {
+        // Randomly update battery or task on a couple riders to simulate live tracking
+        allRiders.forEach(r => {
+          if (Math.random() > 0.6) {
+            r.battery = Math.max(20, Math.min(100, (r.battery || 85) + (Math.random() > 0.5 ? -2 : 1)));
+          }
+        });
+        localStorage.setItem("lh_delivery_riders", JSON.stringify(allRiders));
+        loadFleetRiders();
+        showToastNotification("🔄 GPS Telemetry and battery metrics updated live across all 20 riders.");
+      };
+
+      function renderFleetRoster() {
+        const container = document.getElementById("fleetRosterContainer");
+        if (!container) return;
+
+        // Apply filters
+        let filtered = allRiders;
+
+        if (activeZoneFilter !== "all") {
+          filtered = filtered.filter(r => r.zone === activeZoneFilter);
+        }
+
+        if (activeStatusFilter !== "all") {
+          filtered = filtered.filter(r => r.status === activeStatusFilter);
+        }
+
+        if (searchQuery) {
+          filtered = filtered.filter(r => 
+            r.name.toLowerCase().includes(searchQuery) ||
+            r.area.toLowerCase().includes(searchQuery) ||
+            r.zone.toLowerCase().includes(searchQuery) ||
+            r.phone.toLowerCase().includes(searchQuery) ||
+            r.id.toLowerCase().includes(searchQuery) ||
+            r.vehicle.toLowerCase().includes(searchQuery)
+          );
+        }
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state" style="padding: 3rem; background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--slate-200);">
+              <p>🔍 No delivery riders found matching your filter criteria.</p>
+              <button onclick="resetFilters()" class="btn btn-sm btn-outline" style="margin-top: 0.5rem;">Reset Filters</button>
+            </div>
+          `;
+          return;
+        }
+
+        // Group by zone
+        const zonesMap = {};
+        filtered.forEach(rider => {
+          if (!zonesMap[rider.zone]) {
+            zonesMap[rider.zone] = [];
+          }
+          zonesMap[rider.zone].push(rider);
+        });
+
+        const statusClassMap = {
+          available: "status-available",
+          on_delivery: "status-on-delivery",
+          at_hub: "status-at-hub",
+          on_break: "status-break"
+        };
+
+        const statusLabelMap = {
+          available: "🟢 Available",
+          on_delivery: "🚚 On Delivery",
+          at_hub: "🏢 At Hub",
+          on_break: "☕ On Break"
+        };
+
+        let html = "";
+        for (const [zoneName, riders] of Object.entries(zonesMap)) {
+          const availableInZone = riders.filter(r => r.status === "available").length;
+
+          html += `
+            <div class="zone-section-header">
+              <div>
+                <strong style="color: var(--slate-900); font-size: 1.05rem;">📍 ${zoneName}</strong>
+                <span style="font-size: 0.75rem; color: var(--slate-500); margin-left: 0.5rem;">(${riders.length} Assigned Fleet Personnel)</span>
+              </div>
+              <span class="delivery-verified-badge" style="font-size: 0.75rem;">
+                ${availableInZone} Available for Dispatch
+              </span>
+            </div>
+
+            <div class="rider-grid">
+              ${riders.map(rider => `
+                <div class="rider-card" id="rider_card_${rider.id}">
+                  <div>
+                    <div class="rider-header">
+                      <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <div class="rider-avatar">
+                          ${rider.status === 'available' ? '🛵' : (rider.status === 'on_delivery' ? '📦' : '👤')}
+                        </div>
+                        <div>
+                          <strong style="font-size: 0.95rem; color: var(--slate-900);">${rider.name}</strong><br>
+                          <span style="font-size: 0.75rem; color: var(--slate-500);">${rider.id} • ${rider.vehicle}</span>
+                        </div>
+                      </div>
+                      <span class="rider-status-badge ${statusClassMap[rider.status] || 'status-available'}">
+                        ${statusLabelMap[rider.status] || '🟢 Available'}
+                      </span>
+                    </div>
+
+                    <div style="background: var(--slate-50); border: 1px solid var(--slate-100); border-radius: var(--radius-sm); padding: 0.5rem 0.65rem; margin: 0.5rem 0; font-size: 0.78rem; color: var(--slate-700);">
+                      <div>📍 <strong>Assigned Area:</strong> ${rider.area}</div>
+                      <div>📞 <strong>Mobile:</strong> <a href="tel:${rider.phone}" style="color: var(--emerald-600); font-weight: 600;">${rider.phone}</a></div>
+                      <div style="margin-top: 0.25rem; font-size: 0.72rem; color: var(--slate-500);">
+                        ⚡ Battery: <strong>${rider.battery || 88}%</strong> • Rating: <strong style="color: #f59e0b;">★ ${rider.rating}</strong> (${rider.completedDeliveries} Trips)
+                      </div>
+                      ${rider.currentTask ? `<div style="margin-top: 0.25rem; color: #0284c7; font-weight: 600;">📦 Current: ${rider.currentTask}</div>` : ''}
+                    </div>
+                  </div>
+
+                  <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--slate-100); padding-top: 0.5rem; margin-top: 0.5rem;">
+                    <a href="tel:${rider.phone}" class="btn btn-sm btn-outline" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; color: var(--emerald-700); text-decoration: none;">
+                      📞 Call
+                    </a>
+                    <button onclick="cycleRiderStatus('${rider.id}')" class="btn btn-sm btn-secondary" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background: var(--slate-100); border: 1px solid var(--slate-300);">
+                      Change Status
+                    </button>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          `;
+        }
+
+        container.innerHTML = html;
+      }
+
+      window.resetFilters = function() {
+        activeZoneFilter = "all";
+        activeStatusFilter = "all";
+        searchQuery = "";
+        const searchInput = document.getElementById("riderSearchInput");
+        if (searchInput) searchInput.value = "";
+        document.querySelectorAll(".filter-pill-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll("#zoneFilterGroup .filter-pill-btn:first-child, #statusFilterGroup .filter-pill-btn:first-child").forEach(b => b.classList.add("active"));
+        renderFleetRoster();
+      };
+    </script>
+  </body>
+</html>
